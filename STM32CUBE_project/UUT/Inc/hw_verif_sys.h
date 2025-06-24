@@ -10,6 +10,34 @@
 #ifndef INC_HW_VERIF_SYS_H_
 #define INC_HW_VERIF_SYS_H_
 
+/*************************
+ * MACROS                *
+ *************************/
+
+/**
+ * @brief Peripheral codes
+ */
+#define TEST_TIM 1                 // Timer test code
+#define TEST_UART 2                // UART test code
+#define TEST_SPI 4                 // SPI test code
+#define TEST_I2C 8                 // I2C test code
+#define TEST_ADC 16                // ADC test code
+
+/**
+ * @brief Limits
+ */
+#define MAX_BUF 256
+
+/**
+ * @brief Available test results
+ */
+#define TEST_SUCCESS 0x01
+#define TEST_FAILED 0xff
+
+/*************************
+ * TYPESDEFS             *
+ *************************/
+
 /**
  * @brief Holds data for incoming communication
  *
@@ -25,7 +53,7 @@ typedef struct InMsg
 	uint8_t peripheral;            /** Peripheral code */
 	uint8_t n_iter;                /** Number of iterations */
 	uint8_t p_len;                 /** Payload length */
-	char payload[256];             /** Payload buffer */
+	char payload[MAX_BUF];             /** Payload buffer */
 }InMsg_t;
 
 /**
@@ -53,7 +81,7 @@ typedef struct TestData
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t n_iter;                /** Number of iterations */
 	uint8_t p_len;                 /** Payload length */
-	char payload[256];             /** Payload buffer */
+	char payload[MAX_BUF];             /** Payload buffer */
 }TestData_t;
 
 #endif /* INC_HW_VERIF_SYS_H_ */

@@ -50,14 +50,14 @@
 
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
-osThreadId ListenTaskHandle;
+osThreadId UDPListenerTaskHandle;
 osThreadId hwVerifTaskHandle;
 osThreadId uartTestTaskHandle;
 osThreadId i2cTestTaskHandle;
 osThreadId spiTestTaskHandle;
 osThreadId adcTestTaskHandle;
 osThreadId timTestTaskHandle;
-osThreadId responseTaskHandle;
+osThreadId UDPResponderTasHandle;
 osThreadId loggerTaskHandle;
 osMessageQId inMsgQueueHandle;
 osMessageQId outMsgQueueHandle;
@@ -66,6 +66,7 @@ osMessageQId i2cQueueHandle;
 osMessageQId spiQueueHandle;
 osMessageQId adcQueueHandle;
 osMessageQId timQueueHandle;
+osMutexId netconnMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -123,6 +124,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
   printf("Starting FreeRTOS...\n");
   /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of netconnMutex */
+  osMutexDef(netconnMutex);
+  netconnMutexHandle = osMutexCreate(osMutex(netconnMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -174,9 +179,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of ListenTask */
-  osThreadDef(ListenTask, StartTaskListen, osPriorityAboveNormal, 0, 512);
-  ListenTaskHandle = osThreadCreate(osThread(ListenTask), NULL);
+  /* definition and creation of UDPListenerTask */
+  osThreadDef(UDPListenerTask, StartTaskListen, osPriorityAboveNormal, 0, 512);
+  UDPListenerTaskHandle = osThreadCreate(osThread(UDPListenerTask), NULL);
 
   /* definition and creation of hwVerifTask */
   osThreadDef(hwVerifTask, StartTaskHwVerif, osPriorityNormal, 0, 256);
@@ -202,9 +207,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(timTestTask, StartTaskTimTest, osPriorityNormal, 0, 256);
   timTestTaskHandle = osThreadCreate(osThread(timTestTask), NULL);
 
-  /* definition and creation of responseTask */
-  osThreadDef(responseTask, StartResponseTask, osPriorityAboveNormal, 0, 512);
-  responseTaskHandle = osThreadCreate(osThread(responseTask), NULL);
+  /* definition and creation of UDPResponderTas */
+  osThreadDef(UDPResponderTas, StartResponseTask, osPriorityAboveNormal, 0, 512);
+  UDPResponderTasHandle = osThreadCreate(osThread(UDPResponderTas), NULL);
 
   /* definition and creation of loggerTask */
   osThreadDef(loggerTask, StartLoggerTask, osPriorityLow, 0, 128);
@@ -246,6 +251,7 @@ void StartDefaultTask(void const * argument)
 void StartTaskListen(void const * argument)
 {
   /* USER CODE BEGIN StartTaskListen */
+
   /* Infinite loop */
   for(;;)
   {
