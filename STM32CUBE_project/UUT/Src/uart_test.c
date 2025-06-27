@@ -51,21 +51,31 @@ void UartTestTask(void)
 	OutMsg_t out_msg;
 	uint8_t result;
 
-	if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
+	while (1)
 	{
-		printf("uart received test ID: %d", test_data.test_id);
+		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		{
+			printf("uart received test ID: %lu\n", test_data.test_id);
 
-		result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
+			for (uint8_t i=0; i<test_data.n_iter; i++)
+			{
+				result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
+				if (result == TEST_FAILED)
+					break;
+			}
 
-		// load out_msg
-		out_msg.addr = test_data.addr;
-		out_msg.port = test_data.port;
-		out_msg.test_id = test_data.test_id;
-		out_msg.test_result = result;
+			// load out_msg
+			out_msg.addr = test_data.addr;
+			out_msg.port = test_data.port;
+			out_msg.test_id = test_data.test_id;
+			out_msg.test_result = result;
 
-		// send result to queue
-		osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			// send result to queue
+			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+		}
 	}
+
+
 }
 
 uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)

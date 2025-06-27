@@ -5,9 +5,9 @@
 ../Core/Src/freertos.c:344:6:StartTaskUdpListener	16	static
 ../Core/Src/freertos.c:362:6:StartTaskDispatcher	16	static
 ../Core/Src/freertos.c:376:6:StartTaskUartTest	16	static
-../Core/Src/freertos.c:395:6:StartTaskI2cTest	16	static
-../Core/Src/freertos.c:413:6:StartTaskSpiTest	16	static
-../Core/Src/freertos.c:431:6:StartTaskAdcTest	16	static
-../Core/Src/freertos.c:449:6:StartTaskTimTest	16	static
-../Core/Src/freertos.c:467:6:StartResponseTask	16	static
-../Core/Src/freertos.c:481:6:StartLoggerTask	16	static
+../Core/Src/freertos.c:390:6:StartTaskI2cTest	16	static
+../Core/Src/freertos.c:408:6:StartTaskSpiTest	16	static
+../Core/Src/freertos.c:426:6:StartTaskAdcTest	16	static
+../Core/Src/freertos.c:444:6:StartTaskTimTest	16	static
+../Core/Src/freertos.c:462:6:StartResponseTask	16	static
+../Core/Src/freertos.c:476:6:StartLoggerTask	16	static

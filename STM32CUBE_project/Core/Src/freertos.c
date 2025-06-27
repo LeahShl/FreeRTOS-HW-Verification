@@ -376,12 +376,7 @@ void StartTaskDispatcher(void *argument)
 void StartTaskUartTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskUartTest */
-  UartTestTask();
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  UartTestTask(); // loops here
   /* USER CODE END StartTaskUartTest */
 }
 
