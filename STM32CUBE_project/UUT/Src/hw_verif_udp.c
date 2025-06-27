@@ -58,42 +58,39 @@ void UDP_Listen(void)
 
 	while(1)
 	{
-		if(netconn_recv(conn, &buf) == ERR_OK)
+		printf("IN listener\n");
+		if (osMutexAcquire(netconnMutexHandle, osWaitForever) == osOK)
 		{
-			printf("Got message\n");
-			// Load in_msg
-			ip_addr_copy(in_msg.addr, *netbuf_fromaddr(buf));
-			in_msg.port = netbuf_fromport(buf);
+			if(netconn_recv(conn, &buf) == ERR_OK)
+			{
+				printf("Got message\n");
+				// Load in_msg
+				ip_addr_copy(in_msg.addr, *netbuf_fromaddr(buf));
+				in_msg.port = netbuf_fromport(buf);
 
-			n_read = 0;
-			netbuf_copy_partial(buf, &in_msg.test_id, sizeof(in_msg.test_id), n_read);
-			n_read += sizeof(in_msg.test_id);
+				n_read = 0;
+				netbuf_copy_partial(buf, &in_msg.test_id, sizeof(in_msg.test_id), n_read);
+				n_read += sizeof(in_msg.test_id);
 
-			netbuf_copy_partial(buf, &in_msg.peripheral, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.n_iter, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.p_len, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.payload, in_msg.p_len, n_read);
+				netbuf_copy_partial(buf, &in_msg.peripheral, 1, n_read++);
+				netbuf_copy_partial(buf, &in_msg.n_iter, 1, n_read++);
+				netbuf_copy_partial(buf, &in_msg.p_len, 1, n_read++);
+				netbuf_copy_partial(buf, &in_msg.payload, in_msg.p_len, n_read);
 
-			if (in_msg.p_len < sizeof(in_msg.payload))
-			    in_msg.payload[in_msg.p_len] = '\0';
-			printf("Peripheral is: %d\n", in_msg.peripheral);
-			printf("n iterations is: %d\n", in_msg.n_iter);
-			printf("Message is: %s\n", in_msg.payload);
+				if (in_msg.p_len < sizeof(in_msg.payload))
+				    in_msg.payload[in_msg.p_len] = '\0';
+				printf("Peripheral is: %d\n", in_msg.peripheral);
+				printf("n iterations is: %d\n", in_msg.n_iter);
+				printf("Message is: %s\n", in_msg.payload);
 
 
 
-		    // send in_msg to InMsgQueue
-		    osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, osWaitForever);
+			    // send in_msg to InMsgQueue
+			    osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, osWaitForever);
 
-		    netbuf_delete(buf);
+			    netbuf_delete(buf);
+			}
 		}
-		else
-		{
-			printf("ERROR\n");
-			osDelay(1);
-		}
-
-		//netbuf_delete(buf);
 	}
 }
 
@@ -105,6 +102,7 @@ void UDP_Response(void)
 
 	while(1)
 	{
+		printf("IN responder\n");
 		if(osMessageQueueGet(outMsgQueueHandle, &out_msg, 0, osWaitForever) == osOK)
 		{
 			//Load response buffer
@@ -125,6 +123,6 @@ void UDP_Response(void)
 				osMutexRelease(netconnMutexHandle);
 			}
 		}
-		osDelay(1);
+		else osDelay(1);
 	}
 }

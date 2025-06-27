@@ -10,8 +10,6 @@
 #ifndef INC_UART_TEST_H_
 #define INC_UART_TEST_H_
 
-#include <stdint.h>
-
 /*************************
  * FUNCTION DECLARATIONS *
  *************************/

@@ -29,6 +29,7 @@
 #include "hw_verif_udp.h"
 #include "dispatcher.h"
 #include "uart_test.h"
+#include "i2c_test.h"
 
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -64,14 +65,14 @@ osThreadId_t UDPListenerTaskHandle;
 const osThreadAttr_t UDPListenerTask_attributes = {
   .name = "UDPListenerTask",
   .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for DispatcherTask */
 osThreadId_t DispatcherTaskHandle;
 const osThreadAttr_t DispatcherTask_attributes = {
   .name = "DispatcherTask",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 /* Definitions for uartTestTask */
 osThreadId_t uartTestTaskHandle;
@@ -113,7 +114,7 @@ osThreadId_t UDPResponderTasHandle;
 const osThreadAttr_t UDPResponderTas_attributes = {
   .name = "UDPResponderTas",
   .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for loggerTask */
 osThreadId_t loggerTaskHandle;
@@ -329,7 +330,8 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	printf("IN default\n");
+    osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -390,11 +392,7 @@ void StartTaskUartTest(void *argument)
 void StartTaskI2cTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskI2cTest */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	I2cTestTask(); // loops here
   /* USER CODE END StartTaskI2cTest */
 }
 
@@ -479,9 +477,16 @@ void StartLoggerTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	//printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
-	//printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
-    osDelay(1);
+	/*
+	printf("stats---------------------------------\n");
+	printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
+	printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
+	printf("inMsg Q size: %lu\n", osMessageQueueGetCount(inMsgQueueHandle));
+	printf("outMsg Q size: %lu\n", osMessageQueueGetCount(outMsgQueueHandle));
+	printf("--------------------------------------\n");
+    osDelay(10000);
+    */
+	osDelay(1);
   }
   /* USER CODE END StartLoggerTask */
 }

@@ -13,11 +13,13 @@
 
 extern osMessageQueueId_t inMsgQueueHandle;
 extern osMessageQueueId_t uartQueueHandle;
+extern osMessageQueueId_t i2cQueueHandle;
 
 void TestDispatcher(void)
 {
 	while(1)
 	{
+		printf("IN dispatcher\n");
 		InMsg_t in_msg;
 		TestData_t test_data;
 
@@ -41,7 +43,8 @@ void TestDispatcher(void)
 			}
 			if(in_msg.peripheral & TEST_I2C)
 			{
-				// send to q
+				printf("dispatcher sent to I2C\n");
+				osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_SPI)
 			{
@@ -56,7 +59,5 @@ void TestDispatcher(void)
 				// send to q
 			}
 		}
-
-		osDelay(1);
 	}
 }

@@ -39,6 +39,10 @@ extern osMessageQueueId_t outMsgQueueHandle;        /** Result queue to responde
 volatile uint8_t uart4_rx_done;                     /** UART4 receive completed */
 volatile uint8_t uart5_rx_done;                     /** UART5 receive completed */
 
+/*************************
+ * FUNCTION DECLARATIONS *
+ *************************/
+
 uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len);
 
 /****************************
@@ -53,6 +57,7 @@ void UartTestTask(void)
 
 	while (1)
 	{
+		printf("IN uart\n");
 		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
 			printf("uart received test ID: %lu\n", test_data.test_id);
@@ -73,6 +78,7 @@ void UartTestTask(void)
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
 		}
+		else osDelay(1);
 	}
 
 
