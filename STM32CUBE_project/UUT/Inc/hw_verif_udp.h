@@ -18,6 +18,7 @@
  *************************/
 
 #define SERVER_PORT 54321          // Port for UDP communication
+#define RESPONSE_SIZE 5            // Response is always 5 bytes
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -26,9 +27,16 @@
 /**
  * @brief Initiates the udp server
  */
-void UDP_Server_Init();
+void UDP_Server_Init(void);
 
+/**
+ * @brief Listens to UDP port and loads read messages to InMsgQueue
+ */
+void UDP_Listen(void);
 
-
+/**
+ * @brief Reads from OutMsgQueue and sends requests accordingly
+ */
+void UDP_Response(void);
 
 #endif /* INC_HW_VERIF_UDP_H_ */

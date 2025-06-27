@@ -10,6 +10,9 @@
 #ifndef INC_HW_VERIF_SYS_H_
 #define INC_HW_VERIF_SYS_H_
 
+#include "lwip/ip_addr.h"
+#include "cmsis_os2.h"
+
 /*************************
  * MACROS                *
  *************************/
@@ -47,13 +50,14 @@
  */
 typedef struct InMsg
 {
-	struct netconn *conn;          /** Source netconn object */
+	ip_addr_t addr;                /** Source IP address */
+	u16_t port;                    /** Source port */
 
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t peripheral;            /** Peripheral code */
 	uint8_t n_iter;                /** Number of iterations */
 	uint8_t p_len;                 /** Payload length */
-	char payload[MAX_BUF];             /** Payload buffer */
+	char payload[MAX_BUF];         /** Payload buffer */
 }InMsg_t;
 
 /**
@@ -63,7 +67,8 @@ typedef struct InMsg
  */
 typedef struct OutMsg
 {
-	struct netconn *conn;          /** Destination netconn object */
+	ip_addr_t addr;                /** Destination IP address */
+	u16_t port;                    /** Destination port */
 
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t test_result;           /** Test result (success/fail) */
@@ -76,12 +81,13 @@ typedef struct OutMsg
  */
 typedef struct TestData
 {
-	struct netconn *conn;          /** Source netconn object */
+	ip_addr_t addr;                /** Source IP address */
+	u16_t port;                    /** Source port */
 
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t n_iter;                /** Number of iterations */
 	uint8_t p_len;                 /** Payload length */
-	char payload[MAX_BUF];             /** Payload buffer */
+	char payload[MAX_BUF];         /** Payload buffer */
 }TestData_t;
 
 #endif /* INC_HW_VERIF_SYS_H_ */

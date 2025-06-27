@@ -43,7 +43,7 @@
 #define ETHIF_TX_TIMEOUT (2000U)
 /* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
-#define INTERFACE_THREAD_STACK_SIZE ( 350 )
+#define INTERFACE_THREAD_STACK_SIZE ( 800 )
 /* USER CODE END OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Network interface name */
 #define IFNAME0 's'
@@ -131,8 +131,6 @@ ETH_HandleTypeDef heth;
 ETH_TxPacketConfig TxConfig;
 
 /* Private function prototypes -----------------------------------------------*/
-static void ethernetif_input(void const * argument);
-static void RMII_Thread( void const * argument );
 int32_t ETH_PHY_IO_Init(void);
 int32_t ETH_PHY_IO_DeInit (void);
 int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
@@ -201,6 +199,9 @@ void HAL_ETH_ErrorCallback(ETH_HandleTypeDef *handlerEth)
 static void low_level_init(struct netif *netif)
 {
   HAL_StatusTypeDef hal_eth_init_status = HAL_OK;
+/* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+  osThreadAttr_t attributes;
+/* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
   uint32_t duplex, speed = 0;
   int32_t PHYLinkState = 0;
   ETH_MACConfigTypeDef MACConf = {0};
@@ -261,22 +262,19 @@ static void low_level_init(struct netif *netif)
   #endif /* LWIP_ARP */
 
   /* create a binary semaphore used for informing ethernetif of frame reception */
-  osSemaphoreDef(RxSem);
-  RxPktSemaphore = osSemaphoreCreate(osSemaphore(RxSem), 1);
+  RxPktSemaphore = osSemaphoreNew(1, 0, NULL);
 
   /* create a binary semaphore used for informing ethernetif of frame transmission */
-  osSemaphoreDef(TxSem);
-  TxPktSemaphore = osSemaphoreCreate(osSemaphore(TxSem), 1);
-
-  /* Decrease the semaphore's initial count from 1 to 0 */
-  osSemaphoreWait(RxPktSemaphore, 0);
-  osSemaphoreWait(TxPktSemaphore, 0);
+  TxPktSemaphore = osSemaphoreNew(1, 0, NULL);
 
   /* create the task that handles the ETH_MAC */
-/* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
-  osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
-  osThreadCreate (osThread(EthIf), netif);
-/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
+/* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
+  memset(&attributes, 0x0, sizeof(osThreadAttr_t));
+  attributes.name = "EthIf";
+  attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+  attributes.priority = osPriorityRealtime;
+  osThreadNew(ethernetif_input, netif, &attributes);
+/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
 
 /* USER CODE BEGIN PHY_PRE_CONFIG */
 
@@ -354,14 +352,6 @@ static void low_level_init(struct netif *netif)
 
 /* USER CODE END LOW_LEVEL_INIT */
 
-  if(HAL_GetREVID() == 0x1000)
-  {
-    /*
-      This thread will keep resetting the RMII interface until good frames are received
-    */
-    osThreadDef(RMII_Watchdog, RMII_Thread, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE);
-    osThreadCreate (osThread(RMII_Watchdog), NULL);
-  }
 }
 
 /**
@@ -428,7 +418,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
       if(HAL_ETH_GetError(&heth) & HAL_ETH_ERROR_BUSY)
       {
         /* Wait for descriptors to become available */
-        osSemaphoreWait(  TxPktSemaphore, ETHIF_TX_TIMEOUT);
+        osSemaphoreAcquire(  TxPktSemaphore, ETHIF_TX_TIMEOUT);
         HAL_ETH_ReleaseTxPacket(&heth);
         errval = ERR_BUF;
       }
@@ -473,14 +463,14 @@ static struct pbuf * low_level_input(struct netif *netif)
  *
  * @param netif the lwip network interface structure for this ethernetif
  */
-static void ethernetif_input(void const * argument)
+void ethernetif_input(void* argument)
 {
   struct pbuf *p = NULL;
   struct netif *netif = (struct netif *) argument;
 
   for( ;; )
   {
-    if (osSemaphoreWait(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+    if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
     {
       do
       {
@@ -799,8 +789,7 @@ int32_t ETH_PHY_IO_GetTick(void)
   * @brief  Check the ETH link state then update ETH driver and netif link accordingly.
   * @retval None
   */
-
-void ethernet_link_thread(void const * argument)
+void ethernet_link_thread(void* argument)
 {
   ETH_MACConfigTypeDef MACConf = {0};
   int32_t PHYLinkState = 0;
@@ -945,30 +934,3 @@ void HAL_ETH_TxFreeCallback(uint32_t * buff)
 
 /* USER CODE END 8 */
 
-void RMII_Thread( void const * argument )
-{
-  (void) argument;
-
-  for(;;)
-  {
-    /* some unicast good packets are received */
-    if(heth.Instance->MMCRGUFCR > 0U)
-    {
-      /* RMII Init is OK: Delete the Thread */
-      osThreadTerminate(NULL);
-    }
-    else if(heth.Instance->MMCRFCECR > 10U)
-    {
-      /* ETH received too many packets with CRC errors, resetting RMII */
-      SYSCFG->PMC &= ~SYSCFG_PMC_MII_RMII_SEL;
-      SYSCFG->PMC |= SYSCFG_PMC_MII_RMII_SEL;
-
-      heth.Instance->MMCCR |= ETH_MMCCR_CR;
-    }
-    else
-    {
-      /* Delay 200 ms */
-      osDelay(200);
-    }
-  }
-}

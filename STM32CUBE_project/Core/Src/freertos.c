@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hw_verif_sys.h"
+#include "hw_verif_udp.h"
 
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -49,49 +50,144 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-osThreadId defaultTaskHandle;
-osThreadId UDPListenerTaskHandle;
-osThreadId hwVerifTaskHandle;
-osThreadId uartTestTaskHandle;
-osThreadId i2cTestTaskHandle;
-osThreadId spiTestTaskHandle;
-osThreadId adcTestTaskHandle;
-osThreadId timTestTaskHandle;
-osThreadId UDPResponderTasHandle;
-osThreadId loggerTaskHandle;
-osMessageQId inMsgQueueHandle;
-osMessageQId outMsgQueueHandle;
-osMessageQId uartQueueHandle;
-osMessageQId i2cQueueHandle;
-osMessageQId spiQueueHandle;
-osMessageQId adcQueueHandle;
-osMessageQId timQueueHandle;
-osMutexId netconnMutexHandle;
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
+};
+/* Definitions for UDPListenerTask */
+osThreadId_t UDPListenerTaskHandle;
+const osThreadAttr_t UDPListenerTask_attributes = {
+  .name = "UDPListenerTask",
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for DispatcherTask */
+osThreadId_t DispatcherTaskHandle;
+const osThreadAttr_t DispatcherTask_attributes = {
+  .name = "DispatcherTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for uartTestTask */
+osThreadId_t uartTestTaskHandle;
+const osThreadAttr_t uartTestTask_attributes = {
+  .name = "uartTestTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for i2cTestTask */
+osThreadId_t i2cTestTaskHandle;
+const osThreadAttr_t i2cTestTask_attributes = {
+  .name = "i2cTestTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for spiTestTask */
+osThreadId_t spiTestTaskHandle;
+const osThreadAttr_t spiTestTask_attributes = {
+  .name = "spiTestTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for adcTestTask */
+osThreadId_t adcTestTaskHandle;
+const osThreadAttr_t adcTestTask_attributes = {
+  .name = "adcTestTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for timTestTask */
+osThreadId_t timTestTaskHandle;
+const osThreadAttr_t timTestTask_attributes = {
+  .name = "timTestTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for UDPResponderTas */
+osThreadId_t UDPResponderTasHandle;
+const osThreadAttr_t UDPResponderTas_attributes = {
+  .name = "UDPResponderTas",
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for loggerTask */
+osThreadId_t loggerTaskHandle;
+const osThreadAttr_t loggerTask_attributes = {
+  .name = "loggerTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for inMsgQueue */
+osMessageQueueId_t inMsgQueueHandle;
+const osMessageQueueAttr_t inMsgQueue_attributes = {
+  .name = "inMsgQueue"
+};
+/* Definitions for outMsgQueue */
+osMessageQueueId_t outMsgQueueHandle;
+const osMessageQueueAttr_t outMsgQueue_attributes = {
+  .name = "outMsgQueue"
+};
+/* Definitions for uartQueue */
+osMessageQueueId_t uartQueueHandle;
+const osMessageQueueAttr_t uartQueue_attributes = {
+  .name = "uartQueue"
+};
+/* Definitions for i2cQueue */
+osMessageQueueId_t i2cQueueHandle;
+const osMessageQueueAttr_t i2cQueue_attributes = {
+  .name = "i2cQueue"
+};
+/* Definitions for spiQueue */
+osMessageQueueId_t spiQueueHandle;
+const osMessageQueueAttr_t spiQueue_attributes = {
+  .name = "spiQueue"
+};
+/* Definitions for adcQueue */
+osMessageQueueId_t adcQueueHandle;
+const osMessageQueueAttr_t adcQueue_attributes = {
+  .name = "adcQueue"
+};
+/* Definitions for timQueue */
+osMessageQueueId_t timQueueHandle;
+const osMessageQueueAttr_t timQueue_attributes = {
+  .name = "timQueue"
+};
+/* Definitions for netconnMutex */
+osMutexId_t netconnMutexHandle;
+const osMutexAttr_t netconnMutex_attributes = {
+  .name = "netconnMutex"
+};
+/* Definitions for initDoneEvent */
+osEventFlagsId_t initDoneEventHandle;
+const osEventFlagsAttr_t initDoneEvent_attributes = {
+  .name = "initDoneEvent"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const * argument);
-void StartTaskListen(void const * argument);
-void StartTaskHwVerif(void const * argument);
-void StartTaskUartTest(void const * argument);
-void StartTaskI2cTest(void const * argument);
-void StartTaskSpiTest(void const * argument);
-void StartTaskAdcTest(void const * argument);
-void StartTaskTimTest(void const * argument);
-void StartResponseTask(void const * argument);
-void StartLoggerTask(void const * argument);
+void StartDefaultTask(void *argument);
+void StartTaskUdpListener(void *argument);
+void StartTaskDispatcher(void *argument);
+void StartTaskUartTest(void *argument);
+void StartTaskI2cTest(void *argument);
+void StartTaskSpiTest(void *argument);
+void StartTaskAdcTest(void *argument);
+void StartTaskTimTest(void *argument);
+void StartResponseTask(void *argument);
+void StartLoggerTask(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
-/* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
-
 /* Hook prototypes */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
 __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
@@ -99,21 +195,25 @@ __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTask
    /* Run time stack overflow checking is performed if
    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
    called if a stack overflow is detected. */
+	printf("stack overflow from task '%s'\n", pcTaskName);
 }
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
-static StaticTask_t xIdleTaskTCBBuffer;
-static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+/* USER CODE BEGIN 5 */
+void vApplicationMallocFailedHook(void)
 {
-  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
-  *ppxIdleTaskStackBuffer = &xIdleStack[0];
-  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
-  /* place for user code */
+   /* vApplicationMallocFailedHook() will only be called if
+   configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
+   function that will get called if a call to pvPortMalloc() fails.
+   pvPortMalloc() is called internally by the kernel whenever a task, queue,
+   timer or semaphore is created. It is also called by various parts of the
+   demo application. If heap_1.c or heap_2.c are used, then the size of the
+   heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+   FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+   to query the size of free heap space that remains (although it does not
+   provide information on how the remaining heap might be fragmented). */
 }
-/* USER CODE END GET_IDLE_TASK_MEMORY */
+/* USER CODE END 5 */
 
 /**
   * @brief  FreeRTOS initialization
@@ -125,9 +225,8 @@ void MX_FREERTOS_Init(void) {
   printf("Starting FreeRTOS...\n");
   /* USER CODE END Init */
   /* Create the mutex(es) */
-  /* definition and creation of netconnMutex */
-  osMutexDef(netconnMutex);
-  netconnMutexHandle = osMutexCreate(osMutex(netconnMutex));
+  /* creation of netconnMutex */
+  netconnMutexHandle = osMutexNew(&netconnMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -142,82 +241,72 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* definition and creation of inMsgQueue */
-  osMessageQDef(inMsgQueue, 16, InMsg_t);
-  inMsgQueueHandle = osMessageCreate(osMessageQ(inMsgQueue), NULL);
+  /* creation of inMsgQueue */
+  inMsgQueueHandle = osMessageQueueNew (16, sizeof(InMsg_t), &inMsgQueue_attributes);
 
-  /* definition and creation of outMsgQueue */
-  osMessageQDef(outMsgQueue, 16, OutMsg_t);
-  outMsgQueueHandle = osMessageCreate(osMessageQ(outMsgQueue), NULL);
+  /* creation of outMsgQueue */
+  outMsgQueueHandle = osMessageQueueNew (16, sizeof(OutMsg_t), &outMsgQueue_attributes);
 
-  /* definition and creation of uartQueue */
-  osMessageQDef(uartQueue, 8, TestData_t);
-  uartQueueHandle = osMessageCreate(osMessageQ(uartQueue), NULL);
+  /* creation of uartQueue */
+  uartQueueHandle = osMessageQueueNew (8, sizeof(TestData_t), &uartQueue_attributes);
 
-  /* definition and creation of i2cQueue */
-  osMessageQDef(i2cQueue, 8, TestData_t);
-  i2cQueueHandle = osMessageCreate(osMessageQ(i2cQueue), NULL);
+  /* creation of i2cQueue */
+  i2cQueueHandle = osMessageQueueNew (8, sizeof(TestData_t), &i2cQueue_attributes);
 
-  /* definition and creation of spiQueue */
-  osMessageQDef(spiQueue, 8, TestData_t);
-  spiQueueHandle = osMessageCreate(osMessageQ(spiQueue), NULL);
+  /* creation of spiQueue */
+  spiQueueHandle = osMessageQueueNew (8, sizeof(TestData_t), &spiQueue_attributes);
 
-  /* definition and creation of adcQueue */
-  osMessageQDef(adcQueue, 8, TestData_t);
-  adcQueueHandle = osMessageCreate(osMessageQ(adcQueue), NULL);
+  /* creation of adcQueue */
+  adcQueueHandle = osMessageQueueNew (8, sizeof(TestData_t), &adcQueue_attributes);
 
-  /* definition and creation of timQueue */
-  osMessageQDef(timQueue, 8, TestData_t);
-  timQueueHandle = osMessageCreate(osMessageQ(timQueue), NULL);
+  /* creation of timQueue */
+  timQueueHandle = osMessageQueueNew (8, sizeof(TestData_t), &timQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* definition and creation of UDPListenerTask */
-  osThreadDef(UDPListenerTask, StartTaskListen, osPriorityAboveNormal, 0, 512);
-  UDPListenerTaskHandle = osThreadCreate(osThread(UDPListenerTask), NULL);
+  /* creation of UDPListenerTask */
+  UDPListenerTaskHandle = osThreadNew(StartTaskUdpListener, NULL, &UDPListenerTask_attributes);
 
-  /* definition and creation of hwVerifTask */
-  osThreadDef(hwVerifTask, StartTaskHwVerif, osPriorityNormal, 0, 256);
-  hwVerifTaskHandle = osThreadCreate(osThread(hwVerifTask), NULL);
+  /* creation of DispatcherTask */
+  DispatcherTaskHandle = osThreadNew(StartTaskDispatcher, NULL, &DispatcherTask_attributes);
 
-  /* definition and creation of uartTestTask */
-  osThreadDef(uartTestTask, StartTaskUartTest, osPriorityNormal, 0, 256);
-  uartTestTaskHandle = osThreadCreate(osThread(uartTestTask), NULL);
+  /* creation of uartTestTask */
+  uartTestTaskHandle = osThreadNew(StartTaskUartTest, NULL, &uartTestTask_attributes);
 
-  /* definition and creation of i2cTestTask */
-  osThreadDef(i2cTestTask, StartTaskI2cTest, osPriorityNormal, 0, 256);
-  i2cTestTaskHandle = osThreadCreate(osThread(i2cTestTask), NULL);
+  /* creation of i2cTestTask */
+  i2cTestTaskHandle = osThreadNew(StartTaskI2cTest, NULL, &i2cTestTask_attributes);
 
-  /* definition and creation of spiTestTask */
-  osThreadDef(spiTestTask, StartTaskSpiTest, osPriorityNormal, 0, 256);
-  spiTestTaskHandle = osThreadCreate(osThread(spiTestTask), NULL);
+  /* creation of spiTestTask */
+  spiTestTaskHandle = osThreadNew(StartTaskSpiTest, NULL, &spiTestTask_attributes);
 
-  /* definition and creation of adcTestTask */
-  osThreadDef(adcTestTask, StartTaskAdcTest, osPriorityNormal, 0, 256);
-  adcTestTaskHandle = osThreadCreate(osThread(adcTestTask), NULL);
+  /* creation of adcTestTask */
+  adcTestTaskHandle = osThreadNew(StartTaskAdcTest, NULL, &adcTestTask_attributes);
 
-  /* definition and creation of timTestTask */
-  osThreadDef(timTestTask, StartTaskTimTest, osPriorityNormal, 0, 256);
-  timTestTaskHandle = osThreadCreate(osThread(timTestTask), NULL);
+  /* creation of timTestTask */
+  timTestTaskHandle = osThreadNew(StartTaskTimTest, NULL, &timTestTask_attributes);
 
-  /* definition and creation of UDPResponderTas */
-  osThreadDef(UDPResponderTas, StartResponseTask, osPriorityAboveNormal, 0, 512);
-  UDPResponderTasHandle = osThreadCreate(osThread(UDPResponderTas), NULL);
+  /* creation of UDPResponderTas */
+  UDPResponderTasHandle = osThreadNew(StartResponseTask, NULL, &UDPResponderTas_attributes);
 
-  /* definition and creation of loggerTask */
-  osThreadDef(loggerTask, StartLoggerTask, osPriorityLow, 0, 128);
-  loggerTaskHandle = osThreadCreate(osThread(loggerTask), NULL);
+  /* creation of loggerTask */
+  loggerTaskHandle = osThreadNew(StartLoggerTask, NULL, &loggerTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* creation of initDoneEvent */
+  initDoneEventHandle = osEventFlagsNew(&initDoneEvent_attributes);
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
 
 }
 
@@ -228,11 +317,13 @@ void MX_FREERTOS_Init(void) {
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+void StartDefaultTask(void *argument)
 {
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
+  UDP_Server_Init();
+  osEventFlagsSet(initDoneEventHandle, 0x01);
   /* Infinite loop */
   for(;;)
   {
@@ -241,41 +332,40 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END StartDefaultTask */
 }
 
-/* USER CODE BEGIN Header_StartTaskListen */
+/* USER CODE BEGIN Header_StartTaskUdpListener */
 /**
-* @brief Function implementing the ListenTask thread.
+* @brief Function implementing the UDPListenerTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTaskListen */
-void StartTaskListen(void const * argument)
+/* USER CODE END Header_StartTaskUdpListener */
+void StartTaskUdpListener(void *argument)
 {
-  /* USER CODE BEGIN StartTaskListen */
-
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartTaskListen */
+  /* USER CODE BEGIN StartTaskUdpListener */
+  printf("Listener waiting for network...\n");
+  osEventFlagsWait(initDoneEventHandle, 0x01, osFlagsWaitAny, osWaitForever);
+  printf("Network set...\n");
+  printf("Starting UDP Listener...\n");
+  UDP_Listen(); // loops here
+  /* USER CODE END StartTaskUdpListener */
 }
 
-/* USER CODE BEGIN Header_StartTaskHwVerif */
+/* USER CODE BEGIN Header_StartTaskDispatcher */
 /**
-* @brief Function implementing the hwVerifTask thread.
+* @brief Function implementing the DispatcherTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTaskHwVerif */
-void StartTaskHwVerif(void const * argument)
+/* USER CODE END Header_StartTaskDispatcher */
+void StartTaskDispatcher(void *argument)
 {
-  /* USER CODE BEGIN StartTaskHwVerif */
+  /* USER CODE BEGIN StartTaskDispatcher */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartTaskHwVerif */
+  /* USER CODE END StartTaskDispatcher */
 }
 
 /* USER CODE BEGIN Header_StartTaskUartTest */
@@ -285,7 +375,7 @@ void StartTaskHwVerif(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskUartTest */
-void StartTaskUartTest(void const * argument)
+void StartTaskUartTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskUartTest */
   /* Infinite loop */
@@ -303,7 +393,7 @@ void StartTaskUartTest(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskI2cTest */
-void StartTaskI2cTest(void const * argument)
+void StartTaskI2cTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskI2cTest */
   /* Infinite loop */
@@ -321,7 +411,7 @@ void StartTaskI2cTest(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskSpiTest */
-void StartTaskSpiTest(void const * argument)
+void StartTaskSpiTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskSpiTest */
   /* Infinite loop */
@@ -339,7 +429,7 @@ void StartTaskSpiTest(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskAdcTest */
-void StartTaskAdcTest(void const * argument)
+void StartTaskAdcTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskAdcTest */
   /* Infinite loop */
@@ -357,7 +447,7 @@ void StartTaskAdcTest(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskTimTest */
-void StartTaskTimTest(void const * argument)
+void StartTaskTimTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskTimTest */
   /* Infinite loop */
@@ -375,14 +465,10 @@ void StartTaskTimTest(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartResponseTask */
-void StartResponseTask(void const * argument)
+void StartResponseTask(void *argument)
 {
   /* USER CODE BEGIN StartResponseTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  UDP_Response(); // Loops here
   /* USER CODE END StartResponseTask */
 }
 
@@ -393,12 +479,14 @@ void StartResponseTask(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartLoggerTask */
-void StartLoggerTask(void const * argument)
+void StartLoggerTask(void *argument)
 {
   /* USER CODE BEGIN StartLoggerTask */
   /* Infinite loop */
   for(;;)
   {
+	//printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
+	//printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
     osDelay(1);
   }
   /* USER CODE END StartLoggerTask */
