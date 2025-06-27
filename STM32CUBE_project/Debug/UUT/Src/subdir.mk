@@ -5,16 +5,22 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../UUT/Src/dispatcher.c \
 ../UUT/Src/hw_verif_crc.c \
-../UUT/Src/hw_verif_udp.c 
+../UUT/Src/hw_verif_udp.c \
+../UUT/Src/uart_test.c 
 
 OBJS += \
+./UUT/Src/dispatcher.o \
 ./UUT/Src/hw_verif_crc.o \
-./UUT/Src/hw_verif_udp.o 
+./UUT/Src/hw_verif_udp.o \
+./UUT/Src/uart_test.o 
 
 C_DEPS += \
+./UUT/Src/dispatcher.d \
 ./UUT/Src/hw_verif_crc.d \
-./UUT/Src/hw_verif_udp.d 
+./UUT/Src/hw_verif_udp.d \
+./UUT/Src/uart_test.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +30,7 @@ UUT/Src/%.o UUT/Src/%.su UUT/Src/%.cyclo: ../UUT/Src/%.c UUT/Src/subdir.mk
 clean: clean-UUT-2f-Src
 
 clean-UUT-2f-Src:
-	-$(RM) ./UUT/Src/hw_verif_crc.cyclo ./UUT/Src/hw_verif_crc.d ./UUT/Src/hw_verif_crc.o ./UUT/Src/hw_verif_crc.su ./UUT/Src/hw_verif_udp.cyclo ./UUT/Src/hw_verif_udp.d ./UUT/Src/hw_verif_udp.o ./UUT/Src/hw_verif_udp.su
+	-$(RM) ./UUT/Src/dispatcher.cyclo ./UUT/Src/dispatcher.d ./UUT/Src/dispatcher.o ./UUT/Src/dispatcher.su ./UUT/Src/hw_verif_crc.cyclo ./UUT/Src/hw_verif_crc.d ./UUT/Src/hw_verif_crc.o ./UUT/Src/hw_verif_crc.su ./UUT/Src/hw_verif_udp.cyclo ./UUT/Src/hw_verif_udp.d ./UUT/Src/hw_verif_udp.o ./UUT/Src/hw_verif_udp.su ./UUT/Src/uart_test.cyclo ./UUT/Src/uart_test.d ./UUT/Src/uart_test.o ./UUT/Src/uart_test.su
 
 .PHONY: clean-UUT-2f-Src
 

@@ -76,7 +76,11 @@ void UDP_Listen(void)
 
 			if (in_msg.p_len < sizeof(in_msg.payload))
 			    in_msg.payload[in_msg.p_len] = '\0';
+			printf("Peripheral is: %d\n", in_msg.peripheral);
+			printf("n iterations is: %d\n", in_msg.n_iter);
 			printf("Message is: %s\n", in_msg.payload);
+
+
 
 		    // send in_msg to InMsgQueue
 		    osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, osWaitForever);

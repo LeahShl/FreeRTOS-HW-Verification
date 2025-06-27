@@ -27,6 +27,8 @@
 /* USER CODE BEGIN Includes */
 #include "hw_verif_sys.h"
 #include "hw_verif_udp.h"
+#include "dispatcher.h"
+#include "uart_test.h"
 
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -360,11 +362,7 @@ void StartTaskUdpListener(void *argument)
 void StartTaskDispatcher(void *argument)
 {
   /* USER CODE BEGIN StartTaskDispatcher */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  TestDispatcher(); // loops here
   /* USER CODE END StartTaskDispatcher */
 }
 
@@ -378,6 +376,7 @@ void StartTaskDispatcher(void *argument)
 void StartTaskUartTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskUartTest */
+  UartTestTask();
   /* Infinite loop */
   for(;;)
   {
