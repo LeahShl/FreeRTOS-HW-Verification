@@ -78,8 +78,6 @@ void I2cTestTask(void)
 		}
 		else osDelay(1);
 	}
-
-
 }
 
 uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)

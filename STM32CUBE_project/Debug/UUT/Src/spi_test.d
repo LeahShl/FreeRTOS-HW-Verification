@@ -1,14 +1,6 @@
-Core/Src/freertos.o: ../Core/Src/freertos.c \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
- ../Core/Inc/main.h ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
+UUT/Src/spi_test.o: ../UUT/Src/spi_test.c \
+ /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_crc.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
  ../Core/Inc/stm32f7xx_hal_conf.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h \
@@ -45,8 +37,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Core/Inc/main.h \
  /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_sys.h \
  ../Middlewares/Third_Party/LwIP/src/include/lwip/ip_addr.h \
  ../Middlewares/Third_Party/LwIP/src/include/lwip/opt.h \
@@ -59,23 +50,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/LwIP/src/include/lwip/ip4_addr.h \
  ../Middlewares/Third_Party/LwIP/src/include/lwip/ip6_addr.h \
  ../Middlewares/Third_Party/LwIP/src/include/lwip/def.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_udp.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_sys.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/dispatcher.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/uart_test.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/i2c_test.h \
- /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/spi_test.h
-../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
-../Core/Inc/FreeRTOSConfig.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
-../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
-../Core/Inc/main.h:
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
+/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_crc.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 ../Core/Inc/stm32f7xx_hal_conf.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h:
@@ -113,8 +89,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
-../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
-../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+../Core/Inc/main.h:
 /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_sys.h:
 ../Middlewares/Third_Party/LwIP/src/include/lwip/ip_addr.h:
 ../Middlewares/Third_Party/LwIP/src/include/lwip/opt.h:
@@ -128,9 +103,3 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Middlewares/Third_Party/LwIP/src/include/lwip/ip6_addr.h:
 ../Middlewares/Third_Party/LwIP/src/include/lwip/def.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_udp.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_sys.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/dispatcher.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/uart_test.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/i2c_test.h:
-/home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/spi_test.h:

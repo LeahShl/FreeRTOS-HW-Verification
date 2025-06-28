@@ -30,6 +30,7 @@
 #include "dispatcher.h"
 #include "uart_test.h"
 #include "i2c_test.h"
+#include "spi_test.h"
 
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -406,11 +407,7 @@ void StartTaskI2cTest(void *argument)
 void StartTaskSpiTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskSpiTest */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  SpiTestTask(); // loops here
   /* USER CODE END StartTaskSpiTest */
 }
 

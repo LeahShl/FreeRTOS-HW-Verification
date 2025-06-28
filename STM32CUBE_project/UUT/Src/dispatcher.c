@@ -14,6 +14,7 @@
 extern osMessageQueueId_t inMsgQueueHandle;
 extern osMessageQueueId_t uartQueueHandle;
 extern osMessageQueueId_t i2cQueueHandle;
+extern osMessageQueueId_t spiQueueHandle;
 
 void TestDispatcher(void)
 {
@@ -48,7 +49,8 @@ void TestDispatcher(void)
 			}
 			if(in_msg.peripheral & TEST_SPI)
 			{
-				// send to q
+				printf("dispatcher sent to SPI\n");
+				osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_ADC)
 			{

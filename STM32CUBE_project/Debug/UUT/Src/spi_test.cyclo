@@ -1,0 +1,4 @@
+../UUT/Src/spi_test.c:51:6:SpiTestTask	4
+../UUT/Src/spi_test.c:84:9:SPI_Test_Perform	10
+../UUT/Src/spi_test.c:149:6:HAL_SPI_TxCpltCallback	3
+../UUT/Src/spi_test.c:155:6:HAL_SPI_RxCpltCallback	3
