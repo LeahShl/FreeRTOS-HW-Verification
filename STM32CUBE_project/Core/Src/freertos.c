@@ -31,6 +31,8 @@
 #include "uart_test.h"
 #include "i2c_test.h"
 #include "spi_test.h"
+#include "adc_test.h"
+#include "timer_test.h"
 
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -72,8 +74,8 @@ const osThreadAttr_t UDPListenerTask_attributes = {
 osThreadId_t DispatcherTaskHandle;
 const osThreadAttr_t DispatcherTask_attributes = {
   .name = "DispatcherTask",
-  .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal2,
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for uartTestTask */
 osThreadId_t uartTestTaskHandle;
@@ -159,11 +161,6 @@ osMessageQueueId_t timQueueHandle;
 const osMessageQueueAttr_t timQueue_attributes = {
   .name = "timQueue"
 };
-/* Definitions for netconnMutex */
-osMutexId_t netconnMutexHandle;
-const osMutexAttr_t netconnMutex_attributes = {
-  .name = "netconnMutex"
-};
 /* Definitions for initDoneEvent */
 osEventFlagsId_t initDoneEventHandle;
 const osEventFlagsAttr_t initDoneEvent_attributes = {
@@ -228,9 +225,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
   printf("Starting FreeRTOS...\n");
   /* USER CODE END Init */
-  /* Create the mutex(es) */
-  /* creation of netconnMutex */
-  netconnMutexHandle = osMutexNew(&netconnMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -305,6 +299,7 @@ void MX_FREERTOS_Init(void) {
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
+  /* Create the event(s) */
   /* creation of initDoneEvent */
   initDoneEventHandle = osEventFlagsNew(&initDoneEvent_attributes);
 
@@ -331,8 +326,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	printf("IN default\n");
-    osDelay(1000);
+    osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -421,11 +415,7 @@ void StartTaskSpiTest(void *argument)
 void StartTaskAdcTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskAdcTest */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  AdcTestTask(); // loops here
   /* USER CODE END StartTaskAdcTest */
 }
 
@@ -439,11 +429,7 @@ void StartTaskAdcTest(void *argument)
 void StartTaskTimTest(void *argument)
 {
   /* USER CODE BEGIN StartTaskTimTest */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  TimTestTask(); // loops here
   /* USER CODE END StartTaskTimTest */
 }
 
@@ -474,12 +460,17 @@ void StartLoggerTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	/*
+    /*
 	printf("stats---------------------------------\n");
 	printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
 	printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
 	printf("inMsg Q size: %lu\n", osMessageQueueGetCount(inMsgQueueHandle));
 	printf("outMsg Q size: %lu\n", osMessageQueueGetCount(outMsgQueueHandle));
+	printf("uart Q size: %lu\n", osMessageQueueGetCount(uartQueueHandle));
+	printf("i2c Q size: %lu\n", osMessageQueueGetCount(i2cQueueHandle));
+	printf("spi Q size: %lu\n", osMessageQueueGetCount(spiQueueHandle));
+	printf("adc Q size: %lu\n", osMessageQueueGetCount(adcQueueHandle));
+	printf("timer Q size: %lu\n", osMessageQueueGetCount(timQueueHandle));
 	printf("--------------------------------------\n");
     osDelay(10000);
     */

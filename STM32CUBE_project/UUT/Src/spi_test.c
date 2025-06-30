@@ -27,7 +27,7 @@
 extern SPI_HandleTypeDef hspi1;                   /** SPI1 (Master) handle */
 extern SPI_HandleTypeDef hspi4;                   /** SPI4 (Slave) handle */
 
-extern osMessageQueueId_t spiQueueHandle;                /** SPI tests to be done */
+extern osMessageQueueId_t spiQueueHandle;         /** SPI tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;      /** Result queue to responder */
 
 /**
@@ -56,7 +56,7 @@ void SpiTestTask(void)
 
 	while (1)
 	{
-		printf("IN spi");
+		printf("spi waiting for messages\n");
 		if(osMessageQueueGet(spiQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
 			printf("spi received test ID: %lu\n", test_data.test_id);

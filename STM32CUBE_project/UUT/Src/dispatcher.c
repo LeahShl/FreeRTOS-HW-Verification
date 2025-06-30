@@ -15,16 +15,18 @@ extern osMessageQueueId_t inMsgQueueHandle;
 extern osMessageQueueId_t uartQueueHandle;
 extern osMessageQueueId_t i2cQueueHandle;
 extern osMessageQueueId_t spiQueueHandle;
+extern osMessageQueueId_t adcQueueHandle;
+extern osMessageQueueId_t timQueueHandle;
 
 void TestDispatcher(void)
 {
 	while(1)
 	{
-		printf("IN dispatcher\n");
+		//printf("IN dispatcher\n");
 		InMsg_t in_msg;
 		TestData_t test_data;
 
-		if(osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, osWaitForever) == osOK)
+		if(osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, 10) == osOK)
 		{
 			printf("Dispatcher got msg to periph %d!\n", in_msg.peripheral);
 
@@ -54,12 +56,15 @@ void TestDispatcher(void)
 			}
 			if(in_msg.peripheral & TEST_ADC)
 			{
-				// send to q
+				printf("dispatcher sent to ADC\n");
+				osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_TIM)
 			{
-				// send to q
+				printf("dispatcher sent to TIM\n");
+				osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
 			}
 		}
+		else osDelay(1);
 	}
 }

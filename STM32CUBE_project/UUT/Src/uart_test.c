@@ -57,7 +57,7 @@ void UartTestTask(void)
 
 	while (1)
 	{
-		printf("IN uart\n");
+		printf("uart waiting for messages\n");
 		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
 			printf("uart received test ID: %lu\n", test_data.test_id);

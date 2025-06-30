@@ -55,6 +55,8 @@
 #define MEM_SIZE 0x3000
 /*----- Default Value for F7 devices: 0x20048000 -----*/
 #define LWIP_RAM_HEAP_POINTER 0x20048000
+/*----- Default Value for MEMP_NUM_PBUF: 16 ---*/
+#define MEMP_NUM_PBUF 64
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
 #define LWIP_ETHERNET 1
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
@@ -115,11 +117,15 @@
 #define CHECKSUM_CHECK_ICMP6 0
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
+#define LWIP_SO_RCVTIMEO 1
+
 #define LWIP_DEBUG 1
 #define ICMP_DEBUG LWIP_DBG_ON
-//#define ETHARP_DEBUG LWIP_DBG_ON
 #define NETIF_DEBUG LWIP_DBG_ON
 #define UDP_DEBUG LWIP_DBG_ON
+#define PBUF_DEBUG LWIP_DBG_ON
+#define MEM_DEBUG LWIP_DBG_ON
+#define MEMP_DEBUG LWIP_DBG_ON
 /* USER CODE END 1 */
 
 #ifdef __cplusplus

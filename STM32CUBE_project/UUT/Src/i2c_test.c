@@ -55,7 +55,7 @@ void I2cTestTask(void)
 
 	while (1)
 	{
-		printf("IN i2c");
+		printf("i2c waiting for messages\n");
 		if(osMessageQueueGet(i2cQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
 			printf("i2c received test ID: %lu\n", test_data.test_id);
