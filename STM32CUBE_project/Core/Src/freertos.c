@@ -34,6 +34,8 @@
 #include "adc_test.h"
 #include "timer_test.h"
 
+#include "lwip/stats.h"
+
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -474,7 +476,9 @@ void StartLoggerTask(void *argument)
 	printf("--------------------------------------\n");
     osDelay(10000);
     */
-	osDelay(1);
+
+	stats_display();
+	osDelay(5000);
   }
   /* USER CODE END StartLoggerTask */
 }

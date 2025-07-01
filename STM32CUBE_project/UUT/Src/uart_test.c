@@ -6,7 +6,7 @@
  * @brief Implementation of UART test
  * 
  * UART testing protocol:
- *  1. UART4 sends a bit pattern to UART5.
+ *  1. UART4 sends a bit pattern to UA		printf("IN uart\n");RT5.
  *  2. UART5 sends the bit pattern back to UART4.
  *  3. The loopbacked bit pattern is compared to the original via CRC.
  *  4. The test succeeds if the CRC codes match.
@@ -54,11 +54,13 @@ void UartTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+	osStatus_t status;
 
 	while (1)
 	{
-		printf("uart waiting for messages\n");
-		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		//printf("uart waiting for messages\n");
+		status = osMessageQueueGet(uartQueueHandle, &test_data, 0, 10);
+		if(status == osOK)
 		{
 			printf("uart received test ID: %lu\n", test_data.test_id);
 
@@ -76,9 +78,20 @@ void UartTestTask(void)
 			out_msg.test_result = result;
 
 			// send result to queue
-			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			if (osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever) != osOK)
+			{
+				printf("outMsg q full!\n");
+			}
 		}
-		else osDelay(1);
+		else if (status == osErrorTimeout)
+		{
+			osDelay(1);
+		}
+		else
+		{
+			printf("uart msg read error: %d\n", status);
+			osDelay(1);
+		}
 	}
 
 

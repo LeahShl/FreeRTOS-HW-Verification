@@ -59,6 +59,8 @@ void UDP_Listen(void)
 {
 	printf("Listening started\n");
 	struct netbuf *buf;
+	void *raw_data;
+	uint16_t len;
 	InMsg_t in_msg;
 	int n_read;
 	err_t err;
@@ -66,7 +68,7 @@ void UDP_Listen(void)
 
 	while(1)
 	{
-		//printf("IN listener\n");
+		//printf("listener alive\n");
 		err = netconn_recv(conn_recv, &buf);
 	    if(err == ERR_OK)
 		{
@@ -75,6 +77,19 @@ void UDP_Listen(void)
 			ip_addr_copy(in_msg.addr, *netbuf_fromaddr(buf));
 			in_msg.port = netbuf_fromport(buf);
 
+			netbuf_data(buf, &raw_data, &len);
+			netbuf_delete(buf); // finished with buf
+
+			n_read = 0;
+			memcpy(&in_msg.test_id, raw_data, sizeof(in_msg.test_id));
+			n_read += sizeof(in_msg.test_id);
+
+			memcpy(&in_msg.peripheral, &raw_data[n_read++], 1);
+			memcpy(&in_msg.n_iter, &raw_data[n_read++], 1);
+			memcpy(&in_msg.p_len, &raw_data[n_read++], 1);
+			memcpy(&in_msg.payload, &raw_data[n_read], in_msg.p_len);
+
+			/*
 			n_read = 0;
 			netbuf_copy_partial(buf, &in_msg.test_id, sizeof(in_msg.test_id), n_read);
 			n_read += sizeof(in_msg.test_id);
@@ -83,6 +98,10 @@ void UDP_Listen(void)
 			netbuf_copy_partial(buf, &in_msg.n_iter, 1, n_read++);
 			netbuf_copy_partial(buf, &in_msg.p_len, 1, n_read++);
 			netbuf_copy_partial(buf, &in_msg.payload, in_msg.p_len, n_read);
+
+			netbuf_delete(buf); // finished with buf
+            */
+
 
 			if (in_msg.p_len < sizeof(in_msg.payload))
 				in_msg.payload[in_msg.p_len] = '\0';
@@ -95,12 +114,10 @@ void UDP_Listen(void)
 			{
 				printf("inMsg full, dropped msg\n");
 			}
-
-			netbuf_delete(buf);
 		}
 	    else if (err == ERR_TIMEOUT)
 	    {
-	    	osDelay(1);
+	    	osDelay(0);
 	    }
 	    else
 	    {
@@ -125,7 +142,6 @@ void UDP_Response(void)
 			buf = netbuf_new();
 			if (!buf)
 			{
-				osDelay(1);
 				continue;
 			}
 
@@ -139,13 +155,9 @@ void UDP_Response(void)
 			((uint8_t *)data)[sizeof(out_msg.test_id)] = out_msg.test_result;
 
 			// Send response
-			if (netconn_connect(conn_send, &out_msg.addr, out_msg.port) == ERR_OK)
+			if (netconn_sendto(conn_send, buf, &out_msg.addr, out_msg.port) != ERR_OK)
 			{
-				if (netconn_send(conn_send, buf) != ERR_OK)
-				{
-					printf("Error sending response\n");
-				}
-				netconn_disconnect(conn_send);
+				printf("Error sending response\n");
 			}
 			else
 			{

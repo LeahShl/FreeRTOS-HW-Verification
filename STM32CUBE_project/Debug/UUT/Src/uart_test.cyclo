@@ -1,3 +1,3 @@
-../UUT/Src/uart_test.c:52:6:UartTestTask	4
-../UUT/Src/uart_test.c:87:9:UART_Test_Perform	8
-../UUT/Src/uart_test.c:144:6:HAL_UART_RxCpltCallback	3
+../UUT/Src/uart_test.c:52:6:UartTestTask	6
+../UUT/Src/uart_test.c:100:9:UART_Test_Perform	8
+../UUT/Src/uart_test.c:157:6:HAL_UART_RxCpltCallback	3

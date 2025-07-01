@@ -50,11 +50,13 @@ void AdcTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+	osStatus_t status;
 
 	while (1)
 	{
-		printf("adc waiting for messages\n");
-		if(osMessageQueueGet(adcQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		//printf("adc waiting for messages\n");
+		status = osMessageQueueGet(adcQueueHandle, &test_data, 0, 10);
+		if(status == osOK)
 		{
 			printf("adc received test ID: %lu\n", test_data.test_id);
 
@@ -74,7 +76,15 @@ void AdcTestTask(void)
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
 		}
-		else osDelay(1);
+		else if (status == osErrorTimeout)
+		{
+			osDelay(1);
+		}
+		else
+		{
+			printf("adc msg read error: %d\n", status);
+			osDelay(1);
+		}
 	}
 }
 

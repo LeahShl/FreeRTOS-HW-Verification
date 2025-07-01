@@ -42,27 +42,47 @@ void TestDispatcher(void)
 			if(in_msg.peripheral & TEST_UART)
 			{
 				printf("dispatcher sent to UART\n");
-				osMessageQueuePut(uartQueueHandle, &test_data, 0, osWaitForever);
+				if (osMessageQueuePut(uartQueueHandle, &test_data, 0, 10) != osOK)
+				{
+					printf("uart q full!\n");
+					osDelay(1);
+				}
 			}
 			if(in_msg.peripheral & TEST_I2C)
 			{
 				printf("dispatcher sent to I2C\n");
-				osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
+				if (osMessageQueuePut(i2cQueueHandle, &test_data, 0, 10) != osOK)
+				{
+					printf("i2c q full!\n");
+					osDelay(1);
+    			}
 			}
 			if(in_msg.peripheral & TEST_SPI)
 			{
 				printf("dispatcher sent to SPI\n");
-				osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
+				if (osMessageQueuePut(spiQueueHandle, &test_data, 0, 10) != osOK)
+				{
+					printf("spi q full!\n");
+					osDelay(1);
+				}
 			}
 			if(in_msg.peripheral & TEST_ADC)
 			{
 				printf("dispatcher sent to ADC\n");
-				osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
+				if (osMessageQueuePut(adcQueueHandle, &test_data, 0, 10) != osOK)
+				{
+					printf("adc q full!\n");
+					osDelay(1);
+				}
 			}
 			if(in_msg.peripheral & TEST_TIM)
 			{
 				printf("dispatcher sent to TIM\n");
-				osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
+				if (osMessageQueuePut(timQueueHandle, &test_data, 0, 10) != osOK)
+				{
+					printf("tim q full!\n");
+					osDelay(1);
+				}
 			}
 		}
 		else osDelay(1);
