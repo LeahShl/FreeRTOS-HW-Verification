@@ -25,11 +25,6 @@
  *************************/
 
 /**
- * @brief Initiates the udp server
- */
-void UDP_Server_Init(void);
-
-/**
  * @brief Listens to UDP port and loads read messages to InMsgQueue
  */
 void UDP_Listen(void);

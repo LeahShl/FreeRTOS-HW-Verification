@@ -163,11 +163,6 @@ osMessageQueueId_t timQueueHandle;
 const osMessageQueueAttr_t timQueue_attributes = {
   .name = "timQueue"
 };
-/* Definitions for initDoneEvent */
-osEventFlagsId_t initDoneEventHandle;
-const osEventFlagsAttr_t initDoneEvent_attributes = {
-  .name = "initDoneEvent"
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -301,10 +296,6 @@ void MX_FREERTOS_Init(void) {
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
-  /* Create the event(s) */
-  /* creation of initDoneEvent */
-  initDoneEventHandle = osEventFlagsNew(&initDoneEvent_attributes);
-
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
@@ -323,8 +314,7 @@ void StartDefaultTask(void *argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
-  UDP_Server_Init();
-  osEventFlagsSet(initDoneEventHandle, 0x01);
+  //osEventFlagsSet(initDoneEventHandle, 0x01);
   /* Infinite loop */
   for(;;)
   {
@@ -343,9 +333,7 @@ void StartDefaultTask(void *argument)
 void StartTaskUdpListener(void *argument)
 {
   /* USER CODE BEGIN StartTaskUdpListener */
-  printf("Listener waiting for network...\n");
-  osEventFlagsWait(initDoneEventHandle, 0x01, osFlagsWaitAny, osWaitForever);
-  printf("Network set...\n");
+  //osEventFlagsWait(initDoneEventHandle, 0x01, osFlagsWaitAny, osWaitForever);
   printf("Starting UDP Listener...\n");
   UDP_Listen(); // loops here
   /* USER CODE END StartTaskUdpListener */

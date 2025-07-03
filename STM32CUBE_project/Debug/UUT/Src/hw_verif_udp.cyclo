@@ -1,3 +1,2 @@
-../UUT/Src/hw_verif_udp.c:29:6:UDP_Server_Init	4
-../UUT/Src/hw_verif_udp.c:58:6:UDP_Listen	4
-../UUT/Src/hw_verif_udp.c:163:6:UDP_Response	4
+../UUT/Src/hw_verif_udp.c:29:6:UDP_Listen	3
+../UUT/Src/hw_verif_udp.c:92:6:UDP_Response	4

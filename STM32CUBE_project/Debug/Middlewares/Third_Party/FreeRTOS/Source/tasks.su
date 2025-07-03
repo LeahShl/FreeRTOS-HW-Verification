@@ -2,6 +2,7 @@
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:730:13:xTaskCreate	56	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:821:13:prvInitialiseNewTask	40	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:1072:13:prvAddNewTaskToReadyList	16	static,ignoring_inline_asm
+../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:1157:7:vTaskDelete	24	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:1249:7:vTaskDelayUntil	48	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:1333:7:vTaskDelay	24	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:1378:13:eTaskGetState	40	static,ignoring_inline_asm
@@ -36,11 +37,12 @@
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3310:7:vTaskSetTaskNumber	24	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3334:8:prvIdleTask	16	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3546:13:prvInitialiseTaskLists	16	static
-../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3578:13:prvCheckTasksWaitingTermination	4	static
+../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3578:13:prvCheckTasksWaitingTermination	16	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3609:7:vTaskGetInfo	32	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3705:21:prvListTasksWithinSingleList	48	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3738:32:prvTaskCheckFreeStackSpace	24	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3798:14:uxTaskGetStackHighWaterMark	32	static
+../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3826:14:prvDeleteTCB	24	static,ignoring_inline_asm
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3880:13:prvResetNextTaskUnblockTime	16	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3906:15:xTaskGetCurrentTaskHandle	16	static
 ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c:3923:13:xTaskGetSchedulerState	16	static
