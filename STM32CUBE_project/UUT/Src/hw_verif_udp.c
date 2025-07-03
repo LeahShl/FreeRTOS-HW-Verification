@@ -43,7 +43,7 @@ void UDP_Server_Init(void)
 		while(1);
 	}
 
-	netconn_set_recvtimeout(conn_recv, 100);
+	//netconn_set_recvtimeout(conn_recv, 10);
 
 	conn_send = netconn_new(NETCONN_UDP);
 	if (conn_send == NULL)
@@ -66,6 +66,51 @@ void UDP_Listen(void)
 	err_t err;
 
 
+	while (1)
+	{
+	    do
+	    {
+
+	        err = netconn_recv(conn_recv, &buf);
+	        if (err == ERR_OK)
+	        {
+	        	printf("listener got a message\n");
+				// Load in_msg
+				ip_addr_copy(in_msg.addr, *netbuf_fromaddr(buf));
+				in_msg.port = netbuf_fromport(buf);
+
+				netbuf_data(buf, &raw_data, &len);
+
+				n_read = 0;
+				memcpy(&in_msg.test_id, raw_data, sizeof(in_msg.test_id));
+				n_read += sizeof(in_msg.test_id);
+
+				memcpy(&in_msg.peripheral, &raw_data[n_read++], 1);
+				memcpy(&in_msg.n_iter, &raw_data[n_read++], 1);
+				memcpy(&in_msg.p_len, &raw_data[n_read++], 1);
+				memcpy(&in_msg.payload, &raw_data[n_read], in_msg.p_len);
+
+				if (in_msg.p_len < sizeof(in_msg.payload))
+					in_msg.payload[in_msg.p_len] = '\0';
+				printf("Peripheral is: %d\n", in_msg.peripheral);
+				printf("n iterations is: %d\n", in_msg.n_iter);
+				printf("Message is: %s\n", in_msg.payload);
+
+				// send in_msg to InMsgQueue
+				osStatus_t status = osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, 0);
+				if (status != osOK)
+				{
+					printf("inMsg put error: %d\n", status);
+				}
+
+				netbuf_delete(buf);
+	        }
+	    }
+	    while (err == ERR_OK);
+
+	    osDelay(1);
+	}
+/*
 	while(1)
 	{
 		//printf("listener alive\n");
@@ -89,20 +134,6 @@ void UDP_Listen(void)
 			memcpy(&in_msg.p_len, &raw_data[n_read++], 1);
 			memcpy(&in_msg.payload, &raw_data[n_read], in_msg.p_len);
 
-			/*
-			n_read = 0;
-			netbuf_copy_partial(buf, &in_msg.test_id, sizeof(in_msg.test_id), n_read);
-			n_read += sizeof(in_msg.test_id);
-
-			netbuf_copy_partial(buf, &in_msg.peripheral, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.n_iter, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.p_len, 1, n_read++);
-			netbuf_copy_partial(buf, &in_msg.payload, in_msg.p_len, n_read);
-
-			netbuf_delete(buf); // finished with buf
-            */
-
-
 			if (in_msg.p_len < sizeof(in_msg.payload))
 				in_msg.payload[in_msg.p_len] = '\0';
 			printf("Peripheral is: %d\n", in_msg.peripheral);
@@ -110,9 +141,10 @@ void UDP_Listen(void)
 			printf("Message is: %s\n", in_msg.payload);
 
 			// send in_msg to InMsgQueue
-			if (osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, 10) != osOK)
+			osStatus_t status = osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, 10);
+			if (status != osOK)
 			{
-				printf("inMsg full, dropped msg\n");
+				printf("inMsg put error: %d\n", status);
 			}
 		}
 	    else if (err == ERR_TIMEOUT)
@@ -125,6 +157,7 @@ void UDP_Listen(void)
 	    	osDelay(1);
 	    }
 	}
+	*/
 }
 
 void UDP_Response(void)
@@ -135,19 +168,21 @@ void UDP_Response(void)
 	while(1)
 	{
 		//printf("IN responder\n");
-		if(osMessageQueueGet(outMsgQueueHandle, &out_msg, 0, 10) == osOK)
+		if(osMessageQueueGet(outMsgQueueHandle, &out_msg, 0, 0) == osOK)
 		{
 			printf("responder got a response to send\n");
 			//Load response buffer
 			buf = netbuf_new();
 			if (!buf)
 			{
+				printf("responder netbuf_new() failed");
 				continue;
 			}
 
 			void *data = netbuf_alloc(buf, RESPONSE_SIZE);
 			if (!data)
 			{
+				printf("responder netbuf_alloc() failed");
 			    netbuf_delete(buf);
 			    continue;
 			}
@@ -155,14 +190,16 @@ void UDP_Response(void)
 			((uint8_t *)data)[sizeof(out_msg.test_id)] = out_msg.test_result;
 
 			// Send response
+			netconn_connect(conn_send, &out_msg.addr, out_msg.port);
+			netconn_send(conn_send, buf);
+			netconn_disconnect(conn_send);
+
+			/*
 			if (netconn_sendto(conn_send, buf, &out_msg.addr, out_msg.port) != ERR_OK)
 			{
 				printf("Error sending response\n");
 			}
-			else
-			{
-				printf("Error connecting to client\n");
-			}
+			*/
 			netbuf_delete(buf);
 		}
 		else

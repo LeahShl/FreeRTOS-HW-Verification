@@ -50,15 +50,17 @@
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Default Value for MEMP_NUM_UDP_PCB: 4 ---*/
-#define MEMP_NUM_UDP_PCB 8
+#define MEMP_NUM_UDP_PCB 16
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
 /*----- Default Value for MEM_SIZE: 1600 ---*/
-#define MEM_SIZE 0x5000
+#define MEM_SIZE 0x6400
 /*----- Default Value for F7 devices: 0x20048000 -----*/
 #define LWIP_RAM_HEAP_POINTER 0x20048000
 /*----- Default Value for MEMP_NUM_PBUF: 16 ---*/
 #define MEMP_NUM_PBUF 128
+/*----- Default Value for MEMP_NUM_NETBUF: 2 ---*/
+#define MEMP_NUM_NETBUF 32
 /*----- Default Value for PBUF_POOL_SIZE: 16 ---*/
 #define PBUF_POOL_SIZE 32
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
@@ -123,13 +125,9 @@
 #define CHECKSUM_CHECK_ICMP6 0
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-#define LWIP_SO_RCVTIMEO 1
-#define MEMP_NUM_NETBUF 8
-
-#define MEMP_OVERFLOW_CHECK 2
-#define MEMP_SANITY_CHECK 1
-
+//#define LWIP_SO_RCVTIMEO 1
 #define LWIP_STATS_DISPLAY 1
+#define PBUF_STATS 1
 
 #define LWIP_DEBUG 1
 #define ICMP_DEBUG LWIP_DBG_ON

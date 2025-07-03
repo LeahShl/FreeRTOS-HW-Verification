@@ -85,6 +85,6 @@ void TestDispatcher(void)
 				}
 			}
 		}
-		else osDelay(1);
+		else osDelay(0);
 	}
 }

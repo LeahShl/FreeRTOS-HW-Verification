@@ -462,7 +462,7 @@ void StartLoggerTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    /*
+
 	printf("stats---------------------------------\n");
 	printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
 	printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
@@ -474,11 +474,9 @@ void StartLoggerTask(void *argument)
 	printf("adc Q size: %lu\n", osMessageQueueGetCount(adcQueueHandle));
 	printf("timer Q size: %lu\n", osMessageQueueGetCount(timQueueHandle));
 	printf("--------------------------------------\n");
-    osDelay(10000);
-    */
 
 	stats_display();
-	osDelay(5000);
+	osDelay(30000);
   }
   /* USER CODE END StartLoggerTask */
 }
