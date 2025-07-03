@@ -563,12 +563,12 @@ static void udp_send_data ()
 
 static void udp_receive_data()
 {
-	int addr_len = sizeof(struct sockaddr);
+    struct sockaddr_in from_addr;
+	socklen_t from_len = sizeof(from_addr);
 	char recv_buf[sizeof(in_msg)];
 	
 	int bytes_read = recvfrom(sock, recv_buf, sizeof(in_msg), 0,
-	                          (struct sockaddr *)&sock_addr,
-	                          (socklen_t * restrict)&addr_len);
+	                          (struct sockaddr *)&from_addr, &from_len);
 	
 	if (bytes_read < 0)
 	{
