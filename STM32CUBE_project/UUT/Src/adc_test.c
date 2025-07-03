@@ -32,8 +32,9 @@ extern ADC_HandleTypeDef hadc1;                /** ADC1 handle */
 extern osMessageQueueId_t adcQueueHandle;      /** ADC tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;   /** Result queue to responder */
 
+osSemaphoreId_t adcReadySem;                   /** is ADC ready? */
+
 uint16_t adc_buf[MAX_BUF];                     /** Buffer for ADC samples */
-int adc_ready = 0;                             /** Ready flag for DMA synchronization */
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -52,10 +53,11 @@ void AdcTestTask(void)
 	uint8_t result;
 	osStatus_t status;
 
+	adcReadySem = osSemaphoreNew(1, 0, NULL);
+
 	while (1)
 	{
-		//printf("adc waiting for messages\n");
-		status = osMessageQueueGet(adcQueueHandle, &test_data, 0, 10);
+		status = osMessageQueueGet(adcQueueHandle, &test_data, 0, osWaitForever);
 		if(status == osOK)
 		{
 			printf("adc received test ID: %lu\n", test_data.test_id);
@@ -105,8 +107,12 @@ uint8_t ADC_Test_Perform(void)
 		return TEST_FAILED;
 	}
 
-	while (!adc_ready);
-	adc_ready=0;
+	if (osSemaphoreAcquire(adcReadySem, 10) != osOK) {
+#ifdef PRINT_TESTS_DEBUG
+		printf("ADC semaphore timeout\n");
+#endif
+		return TEST_FAILED;
+	}
 
 #ifdef PRINT_TESTS_DEBUG
 	printf("adc value = %d\n",adc_buf[0]);
@@ -123,7 +129,7 @@ uint8_t ADC_Test_Perform(void)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	adc_ready=1;
+	osSemaphoreRelease(adcReadySem);
 	if(HAL_ADC_Stop_DMA(&hadc1) != HAL_OK)
 	{
 #ifdef PRINT_TESTS_DEBUG
