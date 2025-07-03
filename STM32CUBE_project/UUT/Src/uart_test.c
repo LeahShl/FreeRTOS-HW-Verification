@@ -33,11 +33,8 @@ extern UART_HandleTypeDef huart5;                   /** UART5 handle */
 extern osMessageQueueId_t uartQueueHandle;          /** UART tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;        /** Result queue to responder */
 
-/**
- * @brief DMA syncronization
- */
-volatile uint8_t uart4_rx_done;                     /** UART4 receive completed */
-volatile uint8_t uart5_rx_done;                     /** UART5 receive completed */
+osSemaphoreId_t uart4RxSem;                         /** */
+osSemaphoreId_t uart5RxSem;                         /** */
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -55,6 +52,9 @@ void UartTestTask(void)
 	OutMsg_t out_msg;
 	uint8_t result;
 	osStatus_t status;
+
+	uart4RxSem = osSemaphoreNew(1, 0, NULL);
+	uart5RxSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
@@ -103,9 +103,6 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	printf("Performing uart test\n");
 #endif
 
-	uart4_rx_done = 0;
-	uart5_rx_done = 0;
-
 	uint8_t uart4_rx[MAX_BUF];
 	uint8_t uart5_rx[MAX_BUF];
 
@@ -124,7 +121,12 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while (!uart5_rx_done);
+	if (osSemaphoreAcquire(uart5RxSem, 10) != osOK) {
+#ifdef PRINT_TESTS_DEBUG
+	    printf("uart5 RX semaphore timeout\n");
+#endif
+	    return TEST_FAILED;
+	}
 
 	// Send msg uart5 -> uart4
 	if (HAL_UART_Receive_DMA(&huart4, uart4_rx, msg_len) != HAL_OK)
@@ -141,7 +143,12 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while (!uart4_rx_done);
+	if (osSemaphoreAcquire(uart4RxSem, 10) != osOK) {
+#ifdef PRINT_TESTS_DEBUG
+	    printf("uart4 RX semaphore timeout\n");
+#endif
+	    return TEST_FAILED;
+	}
 
 	// compare crc
 	int crc_result = Match_CRC(msg, msg_len, uart4_rx, msg_len);
@@ -155,7 +162,7 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
  ****************************/
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart == &huart4) uart4_rx_done = 1;
-    if (huart == &huart5) uart5_rx_done = 1;
+    if (huart == &huart4) osSemaphoreRelease(uart4RxSem);;
+    if (huart == &huart5) osSemaphoreRelease(uart5RxSem);;
 }
 
