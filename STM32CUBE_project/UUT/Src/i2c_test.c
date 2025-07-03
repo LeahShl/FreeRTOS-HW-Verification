@@ -29,13 +29,10 @@ extern I2C_HandleTypeDef hi2c2;                   /** I2C2 (Slave) handle */
 extern osMessageQueueId_t i2cQueueHandle;         /** I2C tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;      /** Result queue to responder */
 
-/**
- * @brief DMA syncronization
- */
-volatile uint8_t i2c1_tx_done;                    /** I2C1 (Master) transmit completed */
-volatile uint8_t i2c1_rx_done;                    /** I2C1 (Master) receive completed */
-volatile uint8_t i2c2_tx_done;                    /** I2C2 (Slave) transmit completed */
-volatile uint8_t i2c2_rx_done;                    /** I2C2 (Slave) receive completed */
+osSemaphoreId_t i2c1TxSem;                         /** TX done on i2c1? */
+osSemaphoreId_t i2c1RxSem;                         /** RX done on i2c1? */
+osSemaphoreId_t i2c2TxSem;                         /** TX done on i2c2? */
+osSemaphoreId_t i2c2RxSem;                         /** RX done on i2c2? */
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -52,6 +49,11 @@ void I2cTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+
+	i2c1TxSem = osSemaphoreNew(1, 0, NULL);
+	i2c1RxSem = osSemaphoreNew(1, 0, NULL);
+	i2c2TxSem = osSemaphoreNew(1, 0, NULL);
+	i2c2RxSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
@@ -82,16 +84,7 @@ void I2cTestTask(void)
 
 uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 {
-#ifdef PRINT_TESTS_DEBUG
-	printf("Performing i2c test\n");
-#endif
-
 	HAL_StatusTypeDef status;
-
-	i2c1_tx_done = 0;
-	i2c1_rx_done = 0;
-	i2c2_tx_done = 0;
-	i2c2_rx_done = 0;
 
 	uint8_t i2c1_rx[MAX_BUF];
 	uint8_t i2c2_rx[MAX_BUF];
@@ -114,7 +107,13 @@ uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while (!i2c2_rx_done || !i2c1_tx_done);
+	if (osSemaphoreAcquire(i2c1TxSem, 10) != osOK || osSemaphoreAcquire(i2c2RxSem, 10) != osOK)
+	{
+#ifdef PRINT_TESTS_DEBUG
+		printf("i2c1 -> i2c2 semaphore timeout\n");
+#endif
+		return TEST_FAILED;
+	}
 
 	// Send msg i2c2 -> i2c1
 	status = HAL_I2C_Master_Receive_DMA(&hi2c1, 10<<1, i2c1_rx, msg_len);
@@ -134,7 +133,13 @@ uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while (!i2c1_rx_done || !i2c2_tx_done);
+	if (osSemaphoreAcquire(i2c2TxSem, 10) != osOK || osSemaphoreAcquire(i2c1RxSem, 10) != osOK)
+	{
+#ifdef PRINT_TESTS_DEBUG
+		printf("i2c2 -> i2c1 semaphore timeout\n");
+#endif
+		return TEST_FAILED;
+	}
 
 	// compare crc
 	int crc_result = Match_CRC(msg, msg_len, i2c1_rx, msg_len);
@@ -149,20 +154,20 @@ uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	if (hi2c == &hi2c1) i2c1_tx_done = 1;
+	if (hi2c == &hi2c1) osSemaphoreRelease(i2c1TxSem);
 }
 
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	if (hi2c == &hi2c1) i2c1_rx_done = 1;
+	if (hi2c == &hi2c1) osSemaphoreRelease(i2c1RxSem);
 }
 
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	if (hi2c == &hi2c2) i2c2_tx_done = 1;
+	if (hi2c == &hi2c2) osSemaphoreRelease(i2c2TxSem);
 }
 
 void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	if (hi2c == &hi2c2) i2c2_rx_done = 1;
+	if (hi2c == &hi2c2) osSemaphoreRelease(i2c2RxSem);
 }

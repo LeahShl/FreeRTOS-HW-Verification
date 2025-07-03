@@ -33,8 +33,8 @@ extern UART_HandleTypeDef huart5;                   /** UART5 handle */
 extern osMessageQueueId_t uartQueueHandle;          /** UART tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;        /** Result queue to responder */
 
-osSemaphoreId_t uart4RxSem;                         /** */
-osSemaphoreId_t uart5RxSem;                         /** */
+osSemaphoreId_t uart4RxSem;                         /** RX done on uart4? */
+osSemaphoreId_t uart5RxSem;                         /** RX done on uart5? */
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -51,22 +51,19 @@ void UartTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
-	osStatus_t status;
 
 	uart4RxSem = osSemaphoreNew(1, 0, NULL);
 	uart5RxSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
-		//printf("uart waiting for messages\n");
-		status = osMessageQueueGet(uartQueueHandle, &test_data, 0, 10);
-		if(status == osOK)
+		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
 			printf("uart received test ID: %lu\n", test_data.test_id);
 
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
-				result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
+                result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
 				if (result == TEST_FAILED)
 					break;
 			}
@@ -83,15 +80,6 @@ void UartTestTask(void)
 				printf("outMsg q full!\n");
 			}
 		}
-		else if (status == osErrorTimeout)
-		{
-			osDelay(1);
-		}
-		else
-		{
-			printf("uart msg read error: %d\n", status);
-			osDelay(1);
-		}
 	}
 
 
@@ -99,10 +87,6 @@ void UartTestTask(void)
 
 uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 {
-#ifdef PRINT_TESTS_DEBUG
-	printf("Performing uart test\n");
-#endif
-
 	uint8_t uart4_rx[MAX_BUF];
 	uint8_t uart5_rx[MAX_BUF];
 
@@ -162,7 +146,7 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
  ****************************/
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart == &huart4) osSemaphoreRelease(uart4RxSem);;
-    if (huart == &huart5) osSemaphoreRelease(uart5RxSem);;
+    if (huart == &huart4) osSemaphoreRelease(uart4RxSem);
+    if (huart == &huart5) osSemaphoreRelease(uart5RxSem);
 }
 

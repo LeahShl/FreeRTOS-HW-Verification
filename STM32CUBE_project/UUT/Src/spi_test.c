@@ -30,13 +30,10 @@ extern SPI_HandleTypeDef hspi4;                   /** SPI4 (Slave) handle */
 extern osMessageQueueId_t spiQueueHandle;         /** SPI tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;      /** Result queue to responder */
 
-/**
- * @brief DMA syncronization
- */
-volatile uint8_t spi1_tx_done;                    /** SPI1 (Master) transmit completed */
-volatile uint8_t spi1_rx_done;                    /** SPI1 (Master) receive completed */
-volatile uint8_t spi4_tx_done;                    /** SPI4 (Slave) transmit completed */
-volatile uint8_t spi4_rx_done;                    /** SPI4 (Slave) receive completed */
+osSemaphoreId_t spi1TxSem;                         /** TX done on spi1? */
+osSemaphoreId_t spi1RxSem;                         /** RX done on spi1? */
+osSemaphoreId_t spi4TxSem;                         /** TX done on spi4? */
+osSemaphoreId_t spi4RxSem;                         /** RX done on spi4? */
 
 /*************************
  * FUNCTION DECLARATIONS *
@@ -53,6 +50,11 @@ void SpiTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+
+	spi1TxSem = osSemaphoreNew(1, 0, NULL);
+	spi1RxSem = osSemaphoreNew(1, 0, NULL);
+	spi4TxSem = osSemaphoreNew(1, 0, NULL);
+	spi4RxSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
@@ -83,16 +85,7 @@ void SpiTestTask(void)
 
 uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 {
-#ifdef PRINT_TESTS_DEBUG
-	printf("Performing SPI test\n");
-#endif
-
 	HAL_StatusTypeDef status;
-
-	spi1_tx_done = 0;
-	spi1_rx_done = 0;
-	spi4_tx_done = 0;
-	spi4_rx_done = 0;
 
 	uint8_t spi1_rx[MAX_BUF];
 	uint8_t spi4_rx_tx[MAX_BUF];
@@ -114,7 +107,13 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while(!spi4_rx_done || !spi1_tx_done);
+	if (osSemaphoreAcquire(spi1TxSem, 10) != osOK || osSemaphoreAcquire(spi4RxSem, 10) != osOK)
+	{
+#ifdef PRINT_TESTS_DEBUG
+		printf("spi1 -> spi4 semaphore timeout\n");
+#endif
+		return TEST_FAILED;
+	}
 
 	// send msg spi4 -> spi1
 	status = HAL_SPI_Transmit_DMA(&hspi4, spi4_rx_tx, msg_len);
@@ -133,7 +132,13 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	while(!spi1_rx_done || !spi4_tx_done);
+	if (osSemaphoreAcquire(spi4TxSem, 10) != osOK || osSemaphoreAcquire(spi1RxSem, 10) != osOK)
+	{
+#ifdef PRINT_TESTS_DEBUG
+		printf("spi4 -> spi1 semaphore timeout\n");
+#endif
+		return TEST_FAILED;
+	}
 
 	// Compare CRC
 	int crc_result = Match_CRC(msg, msg_len, spi1_rx, msg_len);
@@ -148,14 +153,14 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	if (hspi == &hspi1) spi1_tx_done = 1;
-	if (hspi == &hspi4) spi4_tx_done = 1;
+	if (hspi == &hspi1) osSemaphoreRelease(spi1TxSem);
+	if (hspi == &hspi4) osSemaphoreRelease(spi4TxSem);
 }
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	if (hspi == &hspi1) spi1_rx_done = 1;
-	if (hspi == &hspi4) spi4_rx_done = 1;
+	if (hspi == &hspi1) osSemaphoreRelease(spi1RxSem);
+	if (hspi == &hspi4) osSemaphoreRelease(spi4RxSem);
 }
 
 

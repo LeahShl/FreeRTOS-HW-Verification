@@ -63,21 +63,21 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityAboveNormal3,
 };
 /* Definitions for UDPListenerTask */
 osThreadId_t UDPListenerTaskHandle;
 const osThreadAttr_t UDPListenerTask_attributes = {
   .name = "UDPListenerTask",
   .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for DispatcherTask */
 osThreadId_t DispatcherTaskHandle;
 const osThreadAttr_t DispatcherTask_attributes = {
   .name = "DispatcherTask",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityAboveNormal1,
 };
 /* Definitions for uartTestTask */
 osThreadId_t uartTestTaskHandle;
@@ -119,7 +119,7 @@ osThreadId_t UDPResponderTasHandle;
 const osThreadAttr_t UDPResponderTas_attributes = {
   .name = "UDPResponderTas",
   .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityAboveNormal2,
 };
 /* Definitions for loggerTask */
 osThreadId_t loggerTaskHandle;
@@ -314,7 +314,6 @@ void StartDefaultTask(void *argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
-  //osEventFlagsSet(initDoneEventHandle, 0x01);
   /* Infinite loop */
   for(;;)
   {
@@ -333,7 +332,6 @@ void StartDefaultTask(void *argument)
 void StartTaskUdpListener(void *argument)
 {
   /* USER CODE BEGIN StartTaskUdpListener */
-  //osEventFlagsWait(initDoneEventHandle, 0x01, osFlagsWaitAny, osWaitForever);
   printf("Starting UDP Listener...\n");
   UDP_Listen(); // loops here
   /* USER CODE END StartTaskUdpListener */
@@ -450,7 +448,7 @@ void StartLoggerTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-
+    /*
 	printf("stats---------------------------------\n");
 	printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
 	printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
@@ -465,6 +463,8 @@ void StartLoggerTask(void *argument)
 
 	stats_display();
 	osDelay(30000);
+	*/
+	  osDelay(1);
   }
   /* USER CODE END StartLoggerTask */
 }
