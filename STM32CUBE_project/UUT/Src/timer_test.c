@@ -37,9 +37,8 @@ extern DMA_HandleTypeDef hdma_tim6_up;        /** DMA handle */
 extern osMessageQueueId_t timQueueHandle;     /** Timer tests to be done */
 extern osMessageQueueId_t outMsgQueueHandle;  /** Result queue to responder */
 
+osSemaphoreId_t testDoneSem;                  /** Is the sampling done yet? */
 
-volatile int test_running;                    /** Is the test running right now? */
-volatile int tim6_count;                      /** Count of basic timer resets */
 uint32_t tim2_samples[N_SAMPLES];             /** Buffer for advanced timer samples */
 
 /*************************
@@ -47,6 +46,8 @@ uint32_t tim2_samples[N_SAMPLES];             /** Buffer for advanced timer samp
  *************************/
 
 uint8_t TIM_Test_Perform(void);
+
+void TIM6_UP_DMA_XferCplt(DMA_HandleTypeDef *hdma);
 
 /****************************
  * FUNCTION IMPLEMENTATION  *
@@ -57,6 +58,8 @@ void TimTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+
+	testDoneSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
@@ -87,12 +90,13 @@ void TimTestTask(void)
 
 uint8_t TIM_Test_Perform(void)
 {
-#ifdef PRINT_TESTS_DEBUG
-	printf("Performing timer test\n");
-#endif
+	static uint8_t callback_registered = 0;
 
-	tim6_count = 0;
-	test_running = 1;
+	if (!callback_registered)
+	{
+		HAL_DMA_RegisterCallback(&hdma_tim6_up, HAL_DMA_XFER_CPLT_CB_ID, TIM6_UP_DMA_XferCplt);
+		callback_registered = 1;
+	}
 
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_Base_Start(&htim6);
@@ -107,7 +111,15 @@ uint8_t TIM_Test_Perform(void)
 	}
     __HAL_TIM_ENABLE_DMA(&htim6, TIM_DMA_UPDATE);
 
-	while (test_running) osDelay(1);
+    if (osSemaphoreAcquire(testDoneSem, osWaitForever) != osOK)
+	{
+#ifdef PRINT_TESTS_DEBUG
+		printf("Timer test: timeout waiting for DMA complete\n");
+#endif
+		HAL_TIM_Base_Stop(&htim6);
+		HAL_TIM_Base_Stop(&htim2);
+		return TEST_FAILED;
+	}
 
 	HAL_TIM_Base_Stop(&htim6);
 	HAL_TIM_Base_Stop(&htim2);
@@ -141,14 +153,14 @@ uint8_t TIM_Test_Perform(void)
  * 	   if (htim == &htim6) tim6_count++;
  * }
  *
- * Using the same strategy with FreeRTOS will bread the code, so I implemented
+ * Using the same strategy with FreeRTOS will break the code, so I implemented
  * here a different strategy.
  */
 
-void HAL_DMA_XferCpltCallback(DMA_HandleTypeDef *hdma)
+void TIM6_UP_DMA_XferCplt(DMA_HandleTypeDef *hdma)
 {
     if (hdma == &hdma_tim6_up)
     {
-        test_running = 0;
+    	osSemaphoreRelease(testDoneSem);
     }
 }
