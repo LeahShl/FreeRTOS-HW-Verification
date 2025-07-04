@@ -1,8 +1,8 @@
 CC= gcc
 CFLAGS= -Wall -Wextra -g
 
-hw_tester: main.o tests_db.o
-	$(CC) $(CFLAGS) main.o tests_db.o -o hw_tester -lsqlite3
+mthw_tester: main.o tests_db.o
+	$(CC) $(CFLAGS) main.o tests_db.o -o mthw_tester -lsqlite3
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c main.c

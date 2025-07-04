@@ -6,19 +6,23 @@
  * USAGE:
  *  1) At least one flag (u, s, i, a, t, or --all) must be present.
  *  2) No flag may appear more than once.
- *  3) Flags can be stacked (e.g. -usi, -at)
+ *  3) Flags can be stacked (e.g. -usi, -at) 
  *  4) If a stack includes (u, s, or i) and is immediately followed by a non-flag token,
  *     that token is taken as the single message for all of {u,s,i} in the stack.
  *  5) A stack that contains a or t must NOT be followed by a message.
  *  6) Separate flags like `-u "msg"` are allowed; same rules for message.
  *  7) Set number of test iterations with -n <int>, for example '-n 20'
- * 
+ *  8) Use --all to run all tests with a single message and receive results concurrently.
+ *     Stacked flags like '-usiat' also run tests in parallel with a shared message.
+ *
  * DATA RETRIEVING
  *  +) Use 'get' and 'export' to retrieve data
  *  +) 'get' prints to stdout test data by test ID
  *  +) 'export' prints to stdout all test data in a csv format (redirect to a file to save)
  */
 
+#include <pthread.h>
+#include <semaphore.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -53,13 +57,14 @@
 #define TEST_FAILED 0xff           // Test failed code
 
 #define N_ITERATIONS 1             // Default number of test iterations
+#define N_TESTS 5                  // Total number of test types
 
 #define ARGS_ERROR 1               // Error parsing command line arguments
 #define UDP_ERROR 2                // UDP communication error
 #define SQLITE_ERROR 3             // SQLite3 database error
 
 /*************************
- * GLOBALS               *
+ * TYPEDEFS              *
  *************************/
 
 /**
@@ -67,25 +72,40 @@
  * 
  * @struct OutMsg
  */
-static struct OutMsg
+typedef struct OutMsg
 {
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t peripheral;            /** Peripheral code */
 	uint8_t n_iter;                /** Number of iterations */
 	uint8_t p_len;                 /** Payload length */
 	char payload[256];             /** Payload buffer */
-}out_msg;
+}OutMsg;
 
 /**
  * @brief Holds data for incoming communication
  * 
  * @struct InMsg
  */
-static struct InMsg
+typedef struct InMsg
 {
 	uint32_t test_id;              /** Unique test ID */
 	uint8_t test_result;           /** Test result (success/fail) */
-}in_msg;
+}InMsg;
+
+/**
+ * @brief Arguments for receiver threads
+ * 
+ * @struct RecvThreadArgs
+ */
+typedef struct RecvThreadArgs
+{
+    int idx;                       /** Thread index */
+    struct InMsg *recv;            /** Received message data */
+}RecvThreadArgs;
+
+/*************************
+ * GLOBALS               *
+ *************************/
 
 static const char *DEFAULT_U_MSG = "Hello UART"; /** Default message (bit pattern) for UART test */
 static const char *DEFAULT_S_MSG = "Hello SPI";  /** Default message (bit pattern) for SPI test */
@@ -99,6 +119,17 @@ static struct sockaddr_in sock_addr;
 static struct hostent *host;
 static char buf[BUFSIZE];
 
+static struct OutMsg out_msg;
+
+/**
+ * Globals for multithreading
+ */
+static pthread_t threads[N_TESTS];
+static int n_threads = 0;
+static sem_t tests_done_sem;
+static struct InMsg in_msgs[N_TESTS];
+static int results[N_TESTS];
+
 /*************************
  * FUNCTION DECLERATIONS *
  *************************/
@@ -111,13 +142,21 @@ static char buf[BUFSIZE];
 static void print_usage(const char *progname);
 
 /**
- * @brief Perform peripheral test based on parameters given
+ * @brief Receiver thread function
  * 
- * @param peripheral Peripheral code
- * @param n_iter Number of test iterations
- * @param msg Bit pattern for the test
+ * @param arg Pointer to struct RecvThreadArgs
+ * @return void* Always NULL
  */
-static void proccess_test(uint8_t peripheral, uint8_t n_iter, const char *msg);
+static void *recv_thread(void *arg);
+
+/**
+ * @brief Perform peripherals test concurrently
+ * 
+ * @param peripherals Peripherals code bitfield
+ * @param n_iter Number of test iterations
+ * @param shared_msg Bit pattern for the test
+ */
+static void run_parallel_tests(uint8_t peripherals, uint8_t n_iter, const char *shared_msg);
 
 /**
  * @brief Format timestamp into a string
@@ -154,7 +193,7 @@ static void udp_send_data();
  * @brief receive udp data and load it to InMsg
  * 
  */
-static void udp_receive_data();
+static void udp_receive_data(struct InMsg *in_msg);
 
 /*************************
  * MAIN                  *
@@ -392,40 +431,31 @@ int main(int argc, char *argv[])
 		exit(SQLITE_ERROR);
 	}
 
-    if (want_u)
+    if (want_u || want_s || want_i || want_a || want_t)
     {
-        printf("[UART] sending test message = \"%s\"\n", msg_u);
-        
-        proccess_test(TEST_UART, n, msg_u);
-		print_log_by_id(out_msg.test_id);
-    }
-    if (want_s)
-    {
-        printf("[SPI] message = \"%s\"\n", msg_s);
-        
-        proccess_test(TEST_SPI, n, msg_s);
-		print_log_by_id(out_msg.test_id);
-    }
-    if (want_i)
-    {
-        printf("[I2C] message = \"%s\"\n", msg_i);
-        
-        proccess_test(TEST_I2C, n, msg_i);
-		print_log_by_id(out_msg.test_id);
-    }
-    if (want_a)
-    {
-        printf("[ADC] (no message)\n");
-        
-        proccess_test(TEST_ADC, n, "");
-		print_log_by_id(out_msg.test_id);
-    }
-    if (want_t)
-    {
-        printf("[TIM] (no message)\n");
-        
-        proccess_test(TEST_TIM, n, "");
-		print_log_by_id(out_msg.test_id);
+        uint8_t peripheral_flags = 0;
+        const char *shared_msg = NULL;
+
+        if (want_u) peripheral_flags |= TEST_UART;
+        if (want_s) peripheral_flags |= TEST_SPI;
+        if (want_i) peripheral_flags |= TEST_I2C;
+        if (want_a) peripheral_flags |= TEST_ADC;
+        if (want_t) peripheral_flags |= TEST_TIM;
+
+        if ((want_u && have_msg_u && msg_u) ||
+            (want_s && have_msg_s && msg_s) ||
+            (want_i && have_msg_i && msg_i))
+        {
+            if (want_u) shared_msg = msg_u;
+            else if (want_s) shared_msg = msg_s;
+            else if (want_i) shared_msg = msg_i;
+        }
+        else
+        {
+            shared_msg = DEFAULT_U_MSG;
+        }
+
+        run_parallel_tests(peripheral_flags, n, shared_msg);
     }
 
     return EXIT_SUCCESS;
@@ -463,40 +493,95 @@ static void print_usage (const char *progname)
     );
 }
 
-static void proccess_test(uint8_t peripheral, uint8_t n_iter, const char *msg)
+static void *recv_thread(void *arg)
 {
-	// Load out_msg
+    struct RecvThreadArgs
+    *args = (struct RecvThreadArgs*)arg;
+
+    udp_receive_data(args->recv);
+    results[args->idx] = (args->recv->test_result == TEST_SUCCESS);
+    sem_post(&tests_done_sem);
+
+    free(arg);
+    return NULL;
+}
+
+static void run_parallel_tests(uint8_t peripherals, uint8_t n_iter, const char *shared_msg)
+{
     int load_success = get_next_id(&out_msg.test_id);
     if (!load_success)
     {
-		perror("loading id from database failed");
-		exit(SQLITE_ERROR);
-	}
-    out_msg.peripheral = peripheral;
+        perror("loading id from database failed");
+        exit(SQLITE_ERROR);
+    }
+
     out_msg.n_iter = n_iter;
-    out_msg.p_len = strlen(msg);
-    strncpy(out_msg.payload, msg, strlen(msg));
-        
-    // Perform test
+    out_msg.p_len = strlen(shared_msg);
+    strncpy(out_msg.payload, shared_msg, strlen(shared_msg));
+
+    udp_init_network();
+    if (!init_db())
+    {
+        perror("databse init failed");
+        exit(SQLITE_ERROR);
+    }
+
+    n_threads = 0;
+
+    if (peripherals & TEST_UART) n_threads++;
+    if (peripherals & TEST_I2C) n_threads++;
+    if (peripherals & TEST_SPI) n_threads++;
+    if (peripherals & TEST_ADC) n_threads++;
+    if (peripherals & TEST_TIM) n_threads++;
+
+    out_msg.peripheral = peripherals;
+
     struct timeval start_time, end_time;
-        
+
     gettimeofday(&start_time, NULL);
     udp_send_data();
-    udp_receive_data();
+
+    sem_init(&tests_done_sem, 0, 0);
+    for (int i = 0; i < n_threads; ++i)
+    {
+        struct RecvThreadArgs *args = malloc(sizeof(struct RecvThreadArgs));
+        args->idx = i;
+        args->recv = &in_msgs[i];
+        pthread_create(&threads[i], NULL, recv_thread, args);
+    }
+
+    for (int i = 0; i < n_threads; ++i)
+        sem_wait(&tests_done_sem);
+
+    for (int i = 0; i < n_threads; ++i)
+        pthread_join(threads[i], NULL);
+
     gettimeofday(&end_time, NULL);
-        
-    // Save log
+
     char timestamp[64];
     format_timestamp(&start_time, timestamp, 64);
-    int result = in_msg.test_result == TEST_SUCCESS? 1 : 0;
     double duration = get_elapsed_seconds(start_time, end_time);
-        
-    int log_success = log_test(out_msg.test_id, timestamp, duration, result);
-    if(!log_success)
+
+    int all_success = 1;
+    for (int i = 0; i < n_threads; ++i)
     {
-	    perror("error logging to database");
-	    exit(SQLITE_ERROR);
-	}
+        if (!results[i])
+            all_success = 0;
+
+        int log_success = log_test(out_msg.test_id, timestamp, duration, results[i]);
+        if(!log_success)
+        {
+            perror("error logging to database");
+            exit(SQLITE_ERROR);
+        }
+
+        print_log_by_id(out_msg.test_id);
+    }
+
+    if (!all_success)
+        exit(EXIT_FAILURE);
+
+    sem_destroy(&tests_done_sem);
 }
 
 static void format_timestamp (struct timeval *tv, char *buffer, size_t size)
@@ -561,7 +646,7 @@ static void udp_send_data ()
 	}
 }
 
-static void udp_receive_data()
+static void udp_receive_data(struct InMsg *in_msg)
 {
     struct sockaddr_in from_addr;
 	socklen_t from_len = sizeof(from_addr);
@@ -582,7 +667,7 @@ static void udp_receive_data()
 	}
 	
 	// load in_msg
-	memcpy(&in_msg.test_id, recv_buf, sizeof(in_msg.test_id));
-	in_msg.test_result = recv_buf[sizeof(in_msg.test_id)];
+	memcpy(&in_msg->test_id, recv_buf, sizeof(in_msg->test_id));
+	in_msg->test_result = recv_buf[sizeof(in_msg->test_id)];
 	
 }
