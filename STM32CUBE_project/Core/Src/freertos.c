@@ -62,22 +62,22 @@
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 2048 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal3,
 };
 /* Definitions for UDPListenerTask */
 osThreadId_t UDPListenerTaskHandle;
 const osThreadAttr_t UDPListenerTask_attributes = {
   .name = "UDPListenerTask",
-  .stack_size = 2048 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal2,
 };
 /* Definitions for DispatcherTask */
 osThreadId_t DispatcherTaskHandle;
 const osThreadAttr_t DispatcherTask_attributes = {
   .name = "DispatcherTask",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal1,
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for uartTestTask */
 osThreadId_t uartTestTaskHandle;
@@ -118,15 +118,8 @@ const osThreadAttr_t timTestTask_attributes = {
 osThreadId_t UDPResponderTasHandle;
 const osThreadAttr_t UDPResponderTas_attributes = {
   .name = "UDPResponderTas",
-  .stack_size = 2048 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal2,
-};
-/* Definitions for loggerTask */
-osThreadId_t loggerTaskHandle;
-const osThreadAttr_t loggerTask_attributes = {
-  .name = "loggerTask",
-  .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for inMsgQueue */
 osMessageQueueId_t inMsgQueueHandle;
@@ -178,7 +171,6 @@ void StartTaskSpiTest(void *argument);
 void StartTaskAdcTest(void *argument);
 void StartTaskTimTest(void *argument);
 void StartResponseTask(void *argument);
-void StartLoggerTask(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -288,9 +280,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of UDPResponderTas */
   UDPResponderTasHandle = osThreadNew(StartResponseTask, NULL, &UDPResponderTas_attributes);
-
-  /* creation of loggerTask */
-  loggerTaskHandle = osThreadNew(StartLoggerTask, NULL, &loggerTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -432,40 +421,6 @@ void StartResponseTask(void *argument)
   /* USER CODE BEGIN StartResponseTask */
   UDP_Response(); // Loops here
   /* USER CODE END StartResponseTask */
-}
-
-/* USER CODE BEGIN Header_StartLoggerTask */
-/**
-* @brief Function implementing the loggerTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartLoggerTask */
-void StartLoggerTask(void *argument)
-{
-  /* USER CODE BEGIN StartLoggerTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    /*
-	printf("stats---------------------------------\n");
-	printf("Free Heap: %lu\n", xPortGetFreeHeapSize());
-	printf("Minimum Ever Free Heap: %lu\n", xPortGetMinimumEverFreeHeapSize());
-	printf("inMsg Q size: %lu\n", osMessageQueueGetCount(inMsgQueueHandle));
-	printf("outMsg Q size: %lu\n", osMessageQueueGetCount(outMsgQueueHandle));
-	printf("uart Q size: %lu\n", osMessageQueueGetCount(uartQueueHandle));
-	printf("i2c Q size: %lu\n", osMessageQueueGetCount(i2cQueueHandle));
-	printf("spi Q size: %lu\n", osMessageQueueGetCount(spiQueueHandle));
-	printf("adc Q size: %lu\n", osMessageQueueGetCount(adcQueueHandle));
-	printf("timer Q size: %lu\n", osMessageQueueGetCount(timQueueHandle));
-	printf("--------------------------------------\n");
-
-	stats_display();
-	osDelay(30000);
-	*/
-	  osDelay(1);
-  }
-  /* USER CODE END StartLoggerTask */
 }
 
 /* Private application code --------------------------------------------------*/
