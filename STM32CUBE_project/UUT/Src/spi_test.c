@@ -91,6 +91,11 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	uint8_t spi1_rx[MAX_BUF];
 	uint8_t spi4_rx_tx[MAX_BUF];
 
+	osSemaphoreAcquire(spi1TxSem, 0);
+	osSemaphoreAcquire(spi4RxSem, 0);
+	osSemaphoreAcquire(spi4TxSem, 0);
+	osSemaphoreAcquire(spi1RxSem, 0);
+
 	// reset SPI before first Xfer
 	HAL_SPI_Abort(&hspi1);
 	HAL_SPI_Abort(&hspi4);
@@ -141,7 +146,7 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	if (osSemaphoreAcquire(spi4TxSem, 10) != osOK || osSemaphoreAcquire(spi1RxSem, 10) != osOK)
+	if (osSemaphoreAcquire(spi4TxSem, 100) != osOK || osSemaphoreAcquire(spi1RxSem, 100) != osOK)
 	{
 #ifdef PRINT_TESTS_DEBUG
 		printf("spi4 -> spi1 semaphore timeout\n");

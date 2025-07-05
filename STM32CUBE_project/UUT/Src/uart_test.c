@@ -89,6 +89,12 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	uint8_t uart4_rx[MAX_BUF];
 	uint8_t uart5_rx[MAX_BUF];
 
+	osSemaphoreAcquire(uart4RxSem, 0);
+	osSemaphoreAcquire(uart5RxSem, 0);
+
+	HAL_UART_Abort(&huart4);
+	HAL_UART_Abort(&huart5);
+
 	// Send msg uart4 -> uart5
 	if (HAL_UART_Receive_DMA(&huart5, uart5_rx, msg_len) != HAL_OK)
 	{
@@ -110,6 +116,9 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 	    return TEST_FAILED;
 	}
+
+	HAL_UART_Abort(&huart4);
+	HAL_UART_Abort(&huart5);
 
 	// Send msg uart5 -> uart4
 	if (HAL_UART_Receive_DMA(&huart4, uart4_rx, msg_len) != HAL_OK)

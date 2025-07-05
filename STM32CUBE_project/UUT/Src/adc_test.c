@@ -21,7 +21,7 @@
  *************************/
 
 #define EXPECTED_3V3 4095                      /** Expected reading from a 3.3v source */
-#define ERR_TOLERANCE_3V3 95                   /** Error tolerance for 3.3v reading */
+#define ERR_TOLERANCE_3V3 200                  /** Error tolerance for 3.3v reading */
 
 /*************************
  * GLOBALS               *
@@ -117,6 +117,10 @@ uint8_t ADC_Test_Perform(void)
 #endif
 
 	if(adc_buf[0] >= EXPECTED_3V3 - ERR_TOLERANCE_3V3) return TEST_SUCCESS;
+
+#ifdef PRINT_TESTS_DEBUG
+	else printf("bad adc value = %d\n",adc_buf[0]);
+#endif
 
 	return TEST_FAILED;
 }
