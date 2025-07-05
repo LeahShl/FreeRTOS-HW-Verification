@@ -7,7 +7,7 @@ This is a revised version of my bare-metal [STM32F746ZG Hardware Verification Sy
 3. [System Requirements](#system-requirements)
 4. [Project Structure](#project-structure)
 5. [Usage](#usage)
-
+6. [Testing Methodology](#testing-methodology)
 
 
 ## What's new
