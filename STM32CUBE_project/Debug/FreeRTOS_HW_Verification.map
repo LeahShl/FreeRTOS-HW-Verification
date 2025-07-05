@@ -32284,9 +32284,9 @@ LOAD /home/leah/st/stm32cubeide_1.18.1/plugins/com.st.stm32cube.ide.mcu.external
  .text.HAL_ADC_ConvCpltCallback
                 0x0801ef2c       0x34 ./UUT/Src/adc_test.o
                 0x0801ef2c                HAL_ADC_ConvCpltCallback
- .text.TestDispatcher
+ .text.TestDispatcherTask
                 0x0801ef60      0x170 ./UUT/Src/dispatcher.o
-                0x0801ef60                TestDispatcher
+                0x0801ef60                TestDispatcherTask
  .text.Match_CRC
                 0x0801f0d0       0x7c ./UUT/Src/hw_verif_crc.o
                 0x0801f0d0                Match_CRC
@@ -34427,84 +34427,84 @@ LOAD /home/leah/st/stm32cubeide_1.18.1/plugins/com.st.stm32cube.ide.mcu.external
  .debug_line    0x0004d3ab      0xc7a ./UUT/Src/timer_test.o
  .debug_line    0x0004e025      0xdb1 ./UUT/Src/uart_test.o
 
-.debug_str      0x00000000   0x123832
- .debug_str     0x00000000   0x123832 ./Core/Src/adc.o
+.debug_str      0x00000000   0x123836
+ .debug_str     0x00000000   0x123836 ./Core/Src/adc.o
                               0xf6ecf (size before relaxing)
- .debug_str     0x00123832    0xf6b92 ./Core/Src/crc.o
- .debug_str     0x00123832    0xf6f4d ./Core/Src/dma.o
- .debug_str     0x00123832   0x10746d ./Core/Src/freertos.o
- .debug_str     0x00123832    0xf696c ./Core/Src/gpio.o
- .debug_str     0x00123832    0xf7896 ./Core/Src/i2c.o
- .debug_str     0x00123832   0x1090da ./Core/Src/main.o
- .debug_str     0x00123832    0xf7539 ./Core/Src/spi.o
- .debug_str     0x00123832    0xf6f3d ./Core/Src/stm32f7xx_hal_msp.o
- .debug_str     0x00123832    0xf7619 ./Core/Src/stm32f7xx_hal_timebase_tim.o
- .debug_str     0x00123832    0xf7d89 ./Core/Src/stm32f7xx_it.o
- .debug_str     0x00123832   0x10067e ./Core/Src/syscalls.o
- .debug_str     0x00123832    0xffcc4 ./Core/Src/sysmem.o
- .debug_str     0x00123832    0xf6ae5 ./Core/Src/system_stm32f7xx.o
- .debug_str     0x00123832    0xf76ac ./Core/Src/tim.o
- .debug_str     0x00123832    0xf780c ./Core/Src/usart.o
- .debug_str     0x00123832       0x9d ./Core/Startup/startup_stm32f756zgtx.o
- .debug_str     0x00123832     0x5cc5 ./Drivers/BSP/Components/lan8742/lan8742.o
- .debug_str     0x00123832    0xf745d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
- .debug_str     0x00123832    0xf6fe5 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.o
- .debug_str     0x00123832    0xf747a ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
- .debug_str     0x00123832    0xf6b20 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc.o
- .debug_str     0x00123832    0xf6ada ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc_ex.o
- .debug_str     0x00123832    0xf6e24 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
- .debug_str     0x00123832    0xf8321 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.o
- .debug_str     0x00123832    0xf6ba3 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
- .debug_str     0x00123832    0xf7cf8 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
- .debug_str     0x00123832    0xf6f77 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
- .debug_str     0x00123832    0xf6d54 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
- .debug_str     0x00123832    0xf6e47 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
- .debug_str     0x00123832    0xf6d7f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
- .debug_str     0x00123832    0xf731f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
- .debug_str     0x00123832    0xf7e08 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
- .debug_str     0x00123832    0xf764e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
- .debug_str     0x00123832    0xf7794 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
- .debug_str     0x00123832   0x108f3d ./LWIP/App/lwip.o
- .debug_str     0x00123832   0x10c2f3 ./LWIP/Target/ethernetif.o
- .debug_str     0x00123832     0xf099 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_str     0x00123832     0xaae2 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_str     0x00123832     0xc608 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_str     0x00123832     0xd58d ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_str     0x00123832     0xce55 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_str     0x00123832     0xb79b ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
- .debug_str     0x00123832     0xb31c ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
- .debug_str     0x00123832   0x10c284 ./Middlewares/Third_Party/LwIP/src/api/api_lib.o
- .debug_str     0x00123832   0x10aef5 ./Middlewares/Third_Party/LwIP/src/api/api_msg.o
- .debug_str     0x00123832   0x102b3a ./Middlewares/Third_Party/LwIP/src/api/netbuf.o
- .debug_str     0x00123832   0x10990d ./Middlewares/Third_Party/LwIP/src/api/tcpip.o
- .debug_str     0x00123832    0xffae0 ./Middlewares/Third_Party/LwIP/src/core/def.o
- .debug_str     0x00123832   0x10d53c ./Middlewares/Third_Party/LwIP/src/core/init.o
- .debug_str     0x00123832   0x103cf4 ./Middlewares/Third_Party/LwIP/src/core/ip.o
- .debug_str     0x00123832   0x105cd2 ./Middlewares/Third_Party/LwIP/src/core/mem.o
- .debug_str     0x00123832   0x10e237 ./Middlewares/Third_Party/LwIP/src/core/memp.o
- .debug_str     0x00123832   0x10b5a6 ./Middlewares/Third_Party/LwIP/src/core/netif.o
- .debug_str     0x00123832   0x10b2a5 ./Middlewares/Third_Party/LwIP/src/core/pbuf.o
- .debug_str     0x00123832   0x1009cd ./Middlewares/Third_Party/LwIP/src/core/stats.o
- .debug_str     0x00123832   0x10663d ./Middlewares/Third_Party/LwIP/src/core/tcp.o
- .debug_str     0x00123832   0x106474 ./Middlewares/Third_Party/LwIP/src/core/tcp_in.o
- .debug_str     0x00123832   0x10648f ./Middlewares/Third_Party/LwIP/src/core/tcp_out.o
- .debug_str     0x00123832   0x10b2cc ./Middlewares/Third_Party/LwIP/src/core/timeouts.o
- .debug_str     0x00123832   0x104c94 ./Middlewares/Third_Party/LwIP/src/core/udp.o
- .debug_str     0x00123832   0x10449c ./Middlewares/Third_Party/LwIP/src/core/ipv4/etharp.o
- .debug_str     0x00123832   0x1042a8 ./Middlewares/Third_Party/LwIP/src/core/ipv4/icmp.o
- .debug_str     0x00123832   0x106175 ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4.o
- .debug_str     0x00123832   0x10303b ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4_addr.o
- .debug_str     0x00123832   0x10466e ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4_frag.o
- .debug_str     0x00123832   0x1048ce ./Middlewares/Third_Party/LwIP/src/netif/ethernet.o
- .debug_str     0x00123832   0x10606c ./Middlewares/Third_Party/LwIP/system/OS/sys_arch.o
- .debug_str     0x00123832   0x101c2b ./UUT/Src/adc_test.o
- .debug_str     0x00123832   0x105dbf ./UUT/Src/dispatcher.o
- .debug_str     0x00123832    0xf6d3a ./UUT/Src/hw_verif_crc.o
- .debug_str     0x00123832   0x1073b2 ./UUT/Src/hw_verif_udp.o
- .debug_str     0x00123832   0x101e0d ./UUT/Src/i2c_test.o
- .debug_str     0x00123832   0x101d70 ./UUT/Src/spi_test.o
- .debug_str     0x00123832   0x101ed3 ./UUT/Src/timer_test.o
- .debug_str     0x00123832   0x106337 ./UUT/Src/uart_test.o
+ .debug_str     0x00123836    0xf6b92 ./Core/Src/crc.o
+ .debug_str     0x00123836    0xf6f4d ./Core/Src/dma.o
+ .debug_str     0x00123836   0x107471 ./Core/Src/freertos.o
+ .debug_str     0x00123836    0xf696c ./Core/Src/gpio.o
+ .debug_str     0x00123836    0xf7896 ./Core/Src/i2c.o
+ .debug_str     0x00123836   0x1090da ./Core/Src/main.o
+ .debug_str     0x00123836    0xf7539 ./Core/Src/spi.o
+ .debug_str     0x00123836    0xf6f3d ./Core/Src/stm32f7xx_hal_msp.o
+ .debug_str     0x00123836    0xf7619 ./Core/Src/stm32f7xx_hal_timebase_tim.o
+ .debug_str     0x00123836    0xf7d89 ./Core/Src/stm32f7xx_it.o
+ .debug_str     0x00123836   0x10067e ./Core/Src/syscalls.o
+ .debug_str     0x00123836    0xffcc4 ./Core/Src/sysmem.o
+ .debug_str     0x00123836    0xf6ae5 ./Core/Src/system_stm32f7xx.o
+ .debug_str     0x00123836    0xf76ac ./Core/Src/tim.o
+ .debug_str     0x00123836    0xf780c ./Core/Src/usart.o
+ .debug_str     0x00123836       0x9d ./Core/Startup/startup_stm32f756zgtx.o
+ .debug_str     0x00123836     0x5cc5 ./Drivers/BSP/Components/lan8742/lan8742.o
+ .debug_str     0x00123836    0xf745d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+ .debug_str     0x00123836    0xf6fe5 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.o
+ .debug_str     0x00123836    0xf747a ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
+ .debug_str     0x00123836    0xf6b20 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc.o
+ .debug_str     0x00123836    0xf6ada ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc_ex.o
+ .debug_str     0x00123836    0xf6e24 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
+ .debug_str     0x00123836    0xf8321 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.o
+ .debug_str     0x00123836    0xf6ba3 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
+ .debug_str     0x00123836    0xf7cf8 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
+ .debug_str     0x00123836    0xf6f77 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
+ .debug_str     0x00123836    0xf6d54 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
+ .debug_str     0x00123836    0xf6e47 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
+ .debug_str     0x00123836    0xf6d7f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
+ .debug_str     0x00123836    0xf731f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
+ .debug_str     0x00123836    0xf7e08 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
+ .debug_str     0x00123836    0xf764e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
+ .debug_str     0x00123836    0xf7794 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
+ .debug_str     0x00123836   0x108f3d ./LWIP/App/lwip.o
+ .debug_str     0x00123836   0x10c2f3 ./LWIP/Target/ethernetif.o
+ .debug_str     0x00123836     0xf099 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_str     0x00123836     0xaae2 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_str     0x00123836     0xc608 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_str     0x00123836     0xd58d ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_str     0x00123836     0xce55 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_str     0x00123836     0xb79b ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
+ .debug_str     0x00123836     0xb31c ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_str     0x00123836   0x10c284 ./Middlewares/Third_Party/LwIP/src/api/api_lib.o
+ .debug_str     0x00123836   0x10aef5 ./Middlewares/Third_Party/LwIP/src/api/api_msg.o
+ .debug_str     0x00123836   0x102b3a ./Middlewares/Third_Party/LwIP/src/api/netbuf.o
+ .debug_str     0x00123836   0x10990d ./Middlewares/Third_Party/LwIP/src/api/tcpip.o
+ .debug_str     0x00123836    0xffae0 ./Middlewares/Third_Party/LwIP/src/core/def.o
+ .debug_str     0x00123836   0x10d53c ./Middlewares/Third_Party/LwIP/src/core/init.o
+ .debug_str     0x00123836   0x103cf4 ./Middlewares/Third_Party/LwIP/src/core/ip.o
+ .debug_str     0x00123836   0x105cd2 ./Middlewares/Third_Party/LwIP/src/core/mem.o
+ .debug_str     0x00123836   0x10e237 ./Middlewares/Third_Party/LwIP/src/core/memp.o
+ .debug_str     0x00123836   0x10b5a6 ./Middlewares/Third_Party/LwIP/src/core/netif.o
+ .debug_str     0x00123836   0x10b2a5 ./Middlewares/Third_Party/LwIP/src/core/pbuf.o
+ .debug_str     0x00123836   0x1009cd ./Middlewares/Third_Party/LwIP/src/core/stats.o
+ .debug_str     0x00123836   0x10663d ./Middlewares/Third_Party/LwIP/src/core/tcp.o
+ .debug_str     0x00123836   0x106474 ./Middlewares/Third_Party/LwIP/src/core/tcp_in.o
+ .debug_str     0x00123836   0x10648f ./Middlewares/Third_Party/LwIP/src/core/tcp_out.o
+ .debug_str     0x00123836   0x10b2cc ./Middlewares/Third_Party/LwIP/src/core/timeouts.o
+ .debug_str     0x00123836   0x104c94 ./Middlewares/Third_Party/LwIP/src/core/udp.o
+ .debug_str     0x00123836   0x10449c ./Middlewares/Third_Party/LwIP/src/core/ipv4/etharp.o
+ .debug_str     0x00123836   0x1042a8 ./Middlewares/Third_Party/LwIP/src/core/ipv4/icmp.o
+ .debug_str     0x00123836   0x106175 ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4.o
+ .debug_str     0x00123836   0x10303b ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4_addr.o
+ .debug_str     0x00123836   0x10466e ./Middlewares/Third_Party/LwIP/src/core/ipv4/ip4_frag.o
+ .debug_str     0x00123836   0x1048ce ./Middlewares/Third_Party/LwIP/src/netif/ethernet.o
+ .debug_str     0x00123836   0x10606c ./Middlewares/Third_Party/LwIP/system/OS/sys_arch.o
+ .debug_str     0x00123836   0x101c2b ./UUT/Src/adc_test.o
+ .debug_str     0x00123836   0x105dc3 ./UUT/Src/dispatcher.o
+ .debug_str     0x00123836    0xf6d3a ./UUT/Src/hw_verif_crc.o
+ .debug_str     0x00123836   0x1073b2 ./UUT/Src/hw_verif_udp.o
+ .debug_str     0x00123836   0x101e0d ./UUT/Src/i2c_test.o
+ .debug_str     0x00123836   0x101d70 ./UUT/Src/spi_test.o
+ .debug_str     0x00123836   0x101ed3 ./UUT/Src/timer_test.o
+ .debug_str     0x00123836   0x106337 ./UUT/Src/uart_test.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Core/Src/adc.o

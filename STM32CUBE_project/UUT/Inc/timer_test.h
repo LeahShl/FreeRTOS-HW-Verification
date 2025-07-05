@@ -16,6 +16,4 @@
 
 void TimTestTask(void);
 
-void TimTestIncreaseCount(void);
-
 #endif /* INC_TIMER_TEST_H_ */

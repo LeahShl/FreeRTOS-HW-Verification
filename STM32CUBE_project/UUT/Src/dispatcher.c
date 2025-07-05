@@ -18,7 +18,7 @@ extern osMessageQueueId_t spiQueueHandle;
 extern osMessageQueueId_t adcQueueHandle;
 extern osMessageQueueId_t timQueueHandle;
 
-void TestDispatcher(void)
+void TestDispatcherTask(void)
 {
 	while(1)
 	{

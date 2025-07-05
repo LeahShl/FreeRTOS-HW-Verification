@@ -43,13 +43,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  19 .debug_line   0004edd6  00000000  00000000  000baddd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_str    00123832  00000000  00000000  00109bb3  2**0
+ 20 .debug_str    00123836  00000000  00000000  00109bb3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .comment      00000043  00000000  00000000  0022d3e5  2**0
+ 21 .comment      00000043  00000000  00000000  0022d3e9  2**0
                   CONTENTS, READONLY
- 22 .debug_frame  0000cc78  00000000  00000000  0022d428  2**2
+ 22 .debug_frame  0000cc78  00000000  00000000  0022d42c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 23 .debug_line_str 00000081  00000000  00000000  0023a0a0  2**0
+ 23 .debug_line_str 00000081  00000000  00000000  0023a0a4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1280,8 +1280,8 @@ void StartTaskDispatcher(void *argument)
  8000af4:	af00      	add	r7, sp, #0
  8000af6:	6078      	str	r0, [r7, #4]
   /* USER CODE BEGIN StartTaskDispatcher */
-  TestDispatcher(); // loops here
- 8000af8:	f01e fa32 	bl	801ef60 <TestDispatcher>
+  TestDispatcherTask(); // loops here
+ 8000af8:	f01e fa32 	bl	801ef60 <TestDispatcherTask>
   /* USER CODE END StartTaskDispatcher */
 }
  8000afc:	bf00      	nop
@@ -85194,12 +85194,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
  801ef58:	20025508 	.word	0x20025508
  801ef5c:	200001e8 	.word	0x200001e8
 
-0801ef60 <TestDispatcher>:
+0801ef60 <TestDispatcherTask>:
 extern osMessageQueueId_t spiQueueHandle;
 extern osMessageQueueId_t adcQueueHandle;
 extern osMessageQueueId_t timQueueHandle;
 
-void TestDispatcher(void)
+void TestDispatcherTask(void)
 {
  801ef60:	b580      	push	{r7, lr}
  801ef62:	f5ad 7d08 	sub.w	sp, sp, #544	@ 0x220
@@ -85210,7 +85210,7 @@ void TestDispatcher(void)
 		TestData_t test_data;
 
 		if(osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, osWaitForever) == osOK)
- 801ef68:	4b53      	ldr	r3, [pc, #332]	@ (801f0b8 <TestDispatcher+0x158>)
+ 801ef68:	4b53      	ldr	r3, [pc, #332]	@ (801f0b8 <TestDispatcherTask+0x158>)
  801ef6a:	6818      	ldr	r0, [r3, #0]
  801ef6c:	4639      	mov	r1, r7
  801ef6e:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
@@ -85218,7 +85218,7 @@ void TestDispatcher(void)
  801ef74:	f7ee fdde 	bl	800db34 <osMessageQueueGet>
  801ef78:	4603      	mov	r3, r0
  801ef7a:	2b00      	cmp	r3, #0
- 801ef7c:	d1f4      	bne.n	801ef68 <TestDispatcher+0x8>
+ 801ef7c:	d1f4      	bne.n	801ef68 <TestDispatcherTask+0x8>
 		{
 			// load test_data
 			test_data.addr = in_msg.addr;
@@ -85275,10 +85275,10 @@ void TestDispatcher(void)
  801f008:	7b1b      	ldrb	r3, [r3, #12]
  801f00a:	f003 0302 	and.w	r3, r3, #2
  801f00e:	2b00      	cmp	r3, #0
- 801f010:	d008      	beq.n	801f024 <TestDispatcher+0xc4>
+ 801f010:	d008      	beq.n	801f024 <TestDispatcherTask+0xc4>
 			{
 				osMessageQueuePut(uartQueueHandle, &test_data, 0, osWaitForever);
- 801f012:	4b2a      	ldr	r3, [pc, #168]	@ (801f0bc <TestDispatcher+0x15c>)
+ 801f012:	4b2a      	ldr	r3, [pc, #168]	@ (801f0bc <TestDispatcherTask+0x15c>)
  801f014:	6818      	ldr	r0, [r3, #0]
  801f016:	f507 7188 	add.w	r1, r7, #272	@ 0x110
  801f01a:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
@@ -85291,10 +85291,10 @@ void TestDispatcher(void)
  801f02c:	7b1b      	ldrb	r3, [r3, #12]
  801f02e:	f003 0308 	and.w	r3, r3, #8
  801f032:	2b00      	cmp	r3, #0
- 801f034:	d008      	beq.n	801f048 <TestDispatcher+0xe8>
+ 801f034:	d008      	beq.n	801f048 <TestDispatcherTask+0xe8>
 			{
 				osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
- 801f036:	4b22      	ldr	r3, [pc, #136]	@ (801f0c0 <TestDispatcher+0x160>)
+ 801f036:	4b22      	ldr	r3, [pc, #136]	@ (801f0c0 <TestDispatcherTask+0x160>)
  801f038:	6818      	ldr	r0, [r3, #0]
  801f03a:	f507 7188 	add.w	r1, r7, #272	@ 0x110
  801f03e:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
@@ -85307,10 +85307,10 @@ void TestDispatcher(void)
  801f050:	7b1b      	ldrb	r3, [r3, #12]
  801f052:	f003 0304 	and.w	r3, r3, #4
  801f056:	2b00      	cmp	r3, #0
- 801f058:	d008      	beq.n	801f06c <TestDispatcher+0x10c>
+ 801f058:	d008      	beq.n	801f06c <TestDispatcherTask+0x10c>
 			{
 				osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
- 801f05a:	4b1a      	ldr	r3, [pc, #104]	@ (801f0c4 <TestDispatcher+0x164>)
+ 801f05a:	4b1a      	ldr	r3, [pc, #104]	@ (801f0c4 <TestDispatcherTask+0x164>)
  801f05c:	6818      	ldr	r0, [r3, #0]
  801f05e:	f507 7188 	add.w	r1, r7, #272	@ 0x110
  801f062:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
@@ -85323,10 +85323,10 @@ void TestDispatcher(void)
  801f074:	7b1b      	ldrb	r3, [r3, #12]
  801f076:	f003 0310 	and.w	r3, r3, #16
  801f07a:	2b00      	cmp	r3, #0
- 801f07c:	d008      	beq.n	801f090 <TestDispatcher+0x130>
+ 801f07c:	d008      	beq.n	801f090 <TestDispatcherTask+0x130>
 			{
 				osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
- 801f07e:	4b12      	ldr	r3, [pc, #72]	@ (801f0c8 <TestDispatcher+0x168>)
+ 801f07e:	4b12      	ldr	r3, [pc, #72]	@ (801f0c8 <TestDispatcherTask+0x168>)
  801f080:	6818      	ldr	r0, [r3, #0]
  801f082:	f507 7188 	add.w	r1, r7, #272	@ 0x110
  801f086:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
@@ -85339,17 +85339,17 @@ void TestDispatcher(void)
  801f098:	7b1b      	ldrb	r3, [r3, #12]
  801f09a:	f003 0301 	and.w	r3, r3, #1
  801f09e:	2b00      	cmp	r3, #0
- 801f0a0:	f43f af62 	beq.w	801ef68 <TestDispatcher+0x8>
+ 801f0a0:	f43f af62 	beq.w	801ef68 <TestDispatcherTask+0x8>
 			{
 				osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
- 801f0a4:	4b09      	ldr	r3, [pc, #36]	@ (801f0cc <TestDispatcher+0x16c>)
+ 801f0a4:	4b09      	ldr	r3, [pc, #36]	@ (801f0cc <TestDispatcherTask+0x16c>)
  801f0a6:	6818      	ldr	r0, [r3, #0]
  801f0a8:	f507 7188 	add.w	r1, r7, #272	@ 0x110
  801f0ac:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
  801f0b0:	2200      	movs	r2, #0
  801f0b2:	f7ee fccb 	bl	800da4c <osMessageQueuePut>
 	{
- 801f0b6:	e757      	b.n	801ef68 <TestDispatcher+0x8>
+ 801f0b6:	e757      	b.n	801ef68 <TestDispatcherTask+0x8>
  801f0b8:	200002d8 	.word	0x200002d8
  801f0bc:	200002e0 	.word	0x200002e0
  801f0c0:	200002e4 	.word	0x200002e4

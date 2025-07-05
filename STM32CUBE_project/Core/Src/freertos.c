@@ -337,7 +337,7 @@ void StartTaskUdpListener(void *argument)
 void StartTaskDispatcher(void *argument)
 {
   /* USER CODE BEGIN StartTaskDispatcher */
-  TestDispatcher(); // loops here
+  TestDispatcherTask(); // loops here
   /* USER CODE END StartTaskDispatcher */
 }
 
