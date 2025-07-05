@@ -91,6 +91,10 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	uint8_t spi1_rx[MAX_BUF];
 	uint8_t spi4_rx_tx[MAX_BUF];
 
+	// reset SPI before first Xfer
+	HAL_SPI_Abort(&hspi1);
+	HAL_SPI_Abort(&hspi4);
+
 	// send msg spi1 -> spi4
 	status = HAL_SPI_Receive_DMA(&hspi4, spi4_rx_tx, msg_len);
 	if (status != HAL_OK)
@@ -108,13 +112,17 @@ uint8_t SPI_Test_Perform(uint8_t *msg, uint8_t msg_len)
 #endif
 		return TEST_FAILED;
 	}
-	if (osSemaphoreAcquire(spi1TxSem, 10) != osOK || osSemaphoreAcquire(spi4RxSem, 10) != osOK)
+	if (osSemaphoreAcquire(spi1TxSem, 100) != osOK || osSemaphoreAcquire(spi4RxSem, 100) != osOK)
 	{
 #ifdef PRINT_TESTS_DEBUG
 		printf("spi1 -> spi4 semaphore timeout\n");
 #endif
 		return TEST_FAILED;
 	}
+
+	// reset SPI before second Xfer
+	HAL_SPI_Abort(&hspi1);
+	HAL_SPI_Abort(&hspi4);
 
 	// send msg spi4 -> spi1
 	status = HAL_SPI_Transmit_DMA(&hspi4, spi4_rx_tx, msg_len);
