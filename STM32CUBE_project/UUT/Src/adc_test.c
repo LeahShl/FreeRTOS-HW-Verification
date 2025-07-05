@@ -60,8 +60,6 @@ void AdcTestTask(void)
 		status = osMessageQueueGet(adcQueueHandle, &test_data, 0, osWaitForever);
 		if(status == osOK)
 		{
-			printf("adc received test ID: %lu\n", test_data.test_id);
-
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
 				result = ADC_Test_Perform();
@@ -74,6 +72,10 @@ void AdcTestTask(void)
 			out_msg.port = test_data.port;
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
+
+#ifdef PRINT_TESTS_DEBUG
+		    printf("ADC test %s\n", result? "success" : "failed");
+#endif
 
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
@@ -92,10 +94,6 @@ void AdcTestTask(void)
 
 uint8_t ADC_Test_Perform(void)
 {
-#ifdef PRINT_TESTS_DEBUG
-	printf("Performing adc test\n");
-#endif
-
 	HAL_StatusTypeDef status;
 
 	status = HAL_ADC_Start_DMA(&hadc1,(uint32_t*)adc_buf,1);

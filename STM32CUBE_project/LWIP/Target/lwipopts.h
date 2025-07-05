@@ -125,7 +125,7 @@
 #define CHECKSUM_CHECK_ICMP6 0
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-//#define LWIP_SO_RCVTIMEO 1
+/*
 #define LWIP_STATS_DISPLAY 1
 #define PBUF_STATS 1
 
@@ -136,6 +136,7 @@
 #define PBUF_DEBUG LWIP_DBG_ON
 #define MEM_DEBUG LWIP_DBG_ON
 #define MEMP_DEBUG LWIP_DBG_ON
+*/
 /* USER CODE END 1 */
 
 #ifdef __cplusplus

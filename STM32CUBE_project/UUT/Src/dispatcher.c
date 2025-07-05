@@ -25,11 +25,8 @@ void TestDispatcher(void)
 		InMsg_t in_msg;
 		TestData_t test_data;
 
-		printf("Dispatcher waiting for messages...\n");
 		if(osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, osWaitForever) == osOK)
 		{
-			printf("Dispatcher got msg to periph %d!\n", in_msg.peripheral);
-
 			// load test_data
 			test_data.addr = in_msg.addr;
 			test_data.port = in_msg.port;
@@ -41,27 +38,22 @@ void TestDispatcher(void)
 			// send to relevant test queue
 			if(in_msg.peripheral & TEST_UART)
 			{
-				printf("dispatcher sent to UART\n");
 				osMessageQueuePut(uartQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_I2C)
 			{
-				printf("dispatcher sent to I2C\n");
 				osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_SPI)
 			{
-				printf("dispatcher sent to SPI\n");
 				osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_ADC)
 			{
-				printf("dispatcher sent to ADC\n");
 				osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
 			}
 			if(in_msg.peripheral & TEST_TIM)
 			{
-				printf("dispatcher sent to TIM\n");
 				osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
 			}
 		}

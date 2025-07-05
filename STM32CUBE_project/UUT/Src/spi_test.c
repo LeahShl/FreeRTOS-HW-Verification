@@ -58,11 +58,8 @@ void SpiTestTask(void)
 
 	while (1)
 	{
-		printf("spi waiting for messages\n");
 		if(osMessageQueueGet(spiQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
-			printf("spi received test ID: %lu\n", test_data.test_id);
-
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
 				result = SPI_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
@@ -75,6 +72,10 @@ void SpiTestTask(void)
 			out_msg.port = test_data.port;
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
+
+#ifdef PRINT_TESTS_DEBUG
+		    printf("SPI test %s\n", result? "success" : "failed");
+#endif
 
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);

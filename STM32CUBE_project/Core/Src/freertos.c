@@ -220,7 +220,7 @@ void vApplicationMallocFailedHook(void)
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-  printf("Starting FreeRTOS...\n");
+
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -332,7 +332,6 @@ void StartDefaultTask(void *argument)
 void StartTaskUdpListener(void *argument)
 {
   /* USER CODE BEGIN StartTaskUdpListener */
-  printf("Starting UDP Listener...\n");
   UDP_Listen(); // loops here
   /* USER CODE END StartTaskUdpListener */
 }

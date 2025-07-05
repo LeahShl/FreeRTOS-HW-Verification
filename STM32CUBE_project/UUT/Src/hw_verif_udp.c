@@ -49,14 +49,10 @@ void UDP_Listen(void)
 		osThreadExit();
 	}
 
-	printf("Listening started\n");
-
 	while (1)
 	{
-		printf("Listener waiting for messages...\n");
 		if (netconn_recv(conn_recv, &buf) == ERR_OK)
 		{
-			printf("listener got a message\n");
 			// Load in_msg
 			in_msg.addr = *netbuf_fromaddr(buf);
 			in_msg.port = netbuf_fromport(buf);
@@ -71,12 +67,6 @@ void UDP_Listen(void)
 			memcpy(&in_msg.n_iter, &raw_data[n_read++], 1);
 			memcpy(&in_msg.p_len, &raw_data[n_read++], 1);
 			memcpy(&in_msg.payload, &raw_data[n_read], in_msg.p_len);
-
-			if (in_msg.p_len < sizeof(in_msg.payload))
-				in_msg.payload[in_msg.p_len] = '\0';
-			printf("Peripheral is: %d\n", in_msg.peripheral);
-			printf("n iterations is: %d\n", in_msg.n_iter);
-			printf("Message is: %s\n", in_msg.payload);
 
 			// send in_msg to InMsgQueue
 			osStatus_t status = osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, osWaitForever);
@@ -108,10 +98,8 @@ void UDP_Response(void)
 
 	while(1)
 	{
-		printf("Responder waiting for messages...\n");
 		if(osMessageQueueGet(outMsgQueueHandle, &out_msg, 0, osWaitForever) == osOK)
 		{
-			printf("responder got a response to send\n");
 			//Load response buffer
 			buf = netbuf_new();
 			if (!buf)
@@ -133,7 +121,6 @@ void UDP_Response(void)
 			// Send response
 			netconn_sendto(conn_send, buf, &out_msg.addr, out_msg.port);
 			netbuf_delete(buf);
-			printf("responder sent to %s:%d\n", ipaddr_ntoa(&out_msg.addr), out_msg.port);
 		}
 	}
 }

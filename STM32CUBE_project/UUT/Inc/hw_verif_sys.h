@@ -17,7 +17,7 @@
  * MACROS                *
  *************************/
 
-#define PRINT_TESTS_DEBUG 1
+//#define PRINT_TESTS_DEBUG 1
 
 /**
  * @brief Peripheral codes

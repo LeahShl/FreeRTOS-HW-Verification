@@ -57,11 +57,8 @@ void I2cTestTask(void)
 
 	while (1)
 	{
-		printf("i2c waiting for messages\n");
 		if(osMessageQueueGet(i2cQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
-			printf("i2c received test ID: %lu\n", test_data.test_id);
-
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
 				result = I2C_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
@@ -74,6 +71,10 @@ void I2cTestTask(void)
 			out_msg.port = test_data.port;
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
+
+#ifdef PRINT_TESTS_DEBUG
+		    printf("I2C test %s\n", result? "success" : "failed");
+#endif
 
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);

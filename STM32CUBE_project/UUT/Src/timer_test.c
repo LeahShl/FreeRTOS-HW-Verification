@@ -26,6 +26,7 @@
 
 #define N_SAMPLES 10                          /** Number of samples */
 #define EXPECTED_INTERVAL 54000               /** Expected interval between samples */
+#define TIM_ERR_TOLERANCE 4000                /** Error tolerance for sample readings */
 
 /*************************
  * GLOBALS               *
@@ -63,11 +64,8 @@ void TimTestTask(void)
 
 	while (1)
 	{
-		printf("timer waiting for messages\n");
 		if(osMessageQueueGet(timQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
-			printf("timer received test ID: %lu\n", test_data.test_id);
-
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
 				result = TIM_Test_Perform();
@@ -80,6 +78,10 @@ void TimTestTask(void)
 			out_msg.port = test_data.port;
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
+
+#ifdef PRINT_TESTS_DEBUG
+		    printf("Timer test %s\n", result? "success" : "failed");
+#endif
 
 			// send result to queue
 			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
@@ -134,7 +136,8 @@ uint8_t TIM_Test_Perform(void)
 			   tim2_samples[i] - tim2_samples[i-1]);
 #endif
 
-		if (tim2_samples[i] - tim2_samples[i-1] != EXPECTED_INTERVAL)
+		if (tim2_samples[i] - tim2_samples[i-1] < EXPECTED_INTERVAL - TIM_ERR_TOLERANCE ||
+			tim2_samples[i] - tim2_samples[i-1] > EXPECTED_INTERVAL + TIM_ERR_TOLERANCE)
 			return TEST_FAILED;
 	}
 

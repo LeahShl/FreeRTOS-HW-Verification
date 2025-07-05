@@ -59,8 +59,6 @@ void UartTestTask(void)
 	{
 		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
 		{
-			printf("uart received test ID: %lu\n", test_data.test_id);
-
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
                 result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
@@ -74,11 +72,12 @@ void UartTestTask(void)
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
 
+#ifdef PRINT_TESTS_DEBUG
+		    printf("UART test %s\n", result? "success" : "failed");
+#endif
+
 			// send result to queue
-			if (osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever) != osOK)
-			{
-				printf("outMsg q full!\n");
-			}
+			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
 		}
 	}
 
