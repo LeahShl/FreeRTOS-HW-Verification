@@ -17,8 +17,8 @@
  * MACROS                *
  *************************/
 
-#define PRINT_TESTS_DEBUG 1
-//#define PRINT_TESTS_DEBUG2 1
+//#define PRINT_TESTS_DEBUG 1        // enable debug prints
+//#define PRINT_TESTS_DEBUG2 1       // enable more debug prints, even annoying ones
 
 /**
  * @brief Peripheral codes

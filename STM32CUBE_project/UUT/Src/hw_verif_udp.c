@@ -37,13 +37,17 @@ void UDP_Listen(void)
 	conn_recv = netconn_new(NETCONN_UDP);
 	if (conn_recv == NULL)
 	{
+#ifdef PRINT_TESTS_DEBUG
 		printf("error initializing UDP receive netconn\n");
+#endif
 		osThreadExit();
 	}
 
 	if (netconn_bind(conn_recv, IP_ADDR_ANY, SERVER_PORT) != ERR_OK)
 	{
+#ifdef PRINT_TESTS_DEBUG
 		printf("error binding UDP port\n");
+#endif
 		netconn_delete(conn_recv);
 		conn_recv = NULL;
 		osThreadExit();
@@ -72,14 +76,18 @@ void UDP_Listen(void)
 			osStatus_t status = osMessageQueuePut(inMsgQueueHandle, &in_msg, 0, osWaitForever);
 			if (status != osOK)
 			{
+#ifdef PRINT_TESTS_DEBUG
 				printf("inMsg put error: %d\n", status);
+#endif
 			}
 
 			netbuf_delete(buf);
 		}
 		else
 		{
+#ifdef PRINT_TESTS_DEBUG
 			printf("netconn_recv failed\n");
+#endif
 		}
 	}
 }
@@ -92,7 +100,9 @@ void UDP_Response(void)
 	conn_send = netconn_new(NETCONN_UDP);
 	if (conn_send == NULL)
 	{
+#ifdef PRINT_TESTS_DEBUG
 		printf("error initializing UDP send netconn\n");
+#endif
 		osThreadExit();
 	}
 
@@ -104,14 +114,18 @@ void UDP_Response(void)
 			buf = netbuf_new();
 			if (!buf)
 			{
+#ifdef PRINT_TESTS_DEBUG
 				printf("responder netbuf_new() failed");
+#endif
 				continue;
 			}
 
 			void *data = netbuf_alloc(buf, RESPONSE_SIZE);
 			if (!data)
 			{
+#ifdef PRINT_TESTS_DEBUG
 				printf("responder netbuf_alloc() failed");
+#endif
 			    netbuf_delete(buf);
 			    continue;
 			}
