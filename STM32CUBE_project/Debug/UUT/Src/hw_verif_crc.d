@@ -1,5 +1,7 @@
-UUT/Src/hw_verif_crc.o: ../UUT/Src/hw_verif_crc.c ../Core/Inc/crc.h \
- ../Core/Inc/main.h ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
+UUT/Src/hw_verif_crc.o: ../UUT/Src/hw_verif_crc.c \
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Core/Inc/crc.h ../Core/Inc/main.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
  ../Core/Inc/stm32f7xx_hal_conf.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h \
@@ -37,6 +39,7 @@ UUT/Src/hw_verif_crc.o: ../UUT/Src/hw_verif_crc.c ../Core/Inc/crc.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
  /home/leah/Documents/RT_Embedded_Course/FreeRTOS-HW-Verification/STM32CUBE_project/UUT/Inc/hw_verif_crc.h
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/crc.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:

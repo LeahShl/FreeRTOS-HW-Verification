@@ -26,7 +26,7 @@
 
 #define N_SAMPLES 10                          /** Number of samples */
 #define EXPECTED_INTERVAL 54000               /** Expected interval between samples */
-#define TIM_ERR_TOLERANCE 4000                /** Error tolerance for sample readings */
+#define TIM_ERR_TOLERANCE 100                 /** Error tolerance for sample readings */
 
 /*************************
  * GLOBALS               *
@@ -80,7 +80,7 @@ void TimTestTask(void)
 			out_msg.test_result = result;
 
 #ifdef PRINT_TESTS_DEBUG
-		    printf("Timer test %s\n", result? "success" : "failed");
+		    printf("Timer test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
 #endif
 
 			// send result to queue
@@ -113,7 +113,7 @@ uint8_t TIM_Test_Perform(void)
 	}
     __HAL_TIM_ENABLE_DMA(&htim6, TIM_DMA_UPDATE);
 
-    if (osSemaphoreAcquire(testDoneSem, osWaitForever) != osOK)
+    if (osSemaphoreAcquire(testDoneSem, 10) != osOK)
 	{
 #ifdef PRINT_TESTS_DEBUG
 		printf("Timer test: timeout waiting for DMA complete\n");
@@ -126,12 +126,12 @@ uint8_t TIM_Test_Perform(void)
 	HAL_TIM_Base_Stop(&htim6);
 	HAL_TIM_Base_Stop(&htim2);
 
-#ifdef PRINT_TESTS_DEBUG
+#ifdef PRINT_TESTS_DEBUG2
 	printf("Sampling complete\n");
 #endif
-	for (int i = 1; i < N_SAMPLES; i++)
+	for (int i = 2; i < N_SAMPLES; i++)
 	{
-#ifdef PRINT_TESTS_DEBUG
+#ifdef PRINT_TESTS_DEBUG2
 		printf("Sample[%d] - sample[%d] = %lu\n", i, i-1,
 			   tim2_samples[i] - tim2_samples[i-1]);
 #endif

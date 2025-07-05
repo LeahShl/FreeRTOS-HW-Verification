@@ -73,7 +73,7 @@ void I2cTestTask(void)
 			out_msg.test_result = result;
 
 #ifdef PRINT_TESTS_DEBUG
-		    printf("I2C test %s\n", result? "success" : "failed");
+		    printf("I2C test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
 #endif
 
 			// send result to queue

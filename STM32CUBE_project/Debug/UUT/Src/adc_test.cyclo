@@ -1,3 +1,3 @@
-../UUT/Src/adc_test.c:49:6:AdcTestTask	5
+../UUT/Src/adc_test.c:49:6:AdcTestTask	6
 ../UUT/Src/adc_test.c:95:9:ADC_Test_Perform	4
 ../UUT/Src/adc_test.c:128:6:HAL_ADC_ConvCpltCallback	2

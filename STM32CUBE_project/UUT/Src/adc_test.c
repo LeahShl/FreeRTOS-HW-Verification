@@ -74,7 +74,7 @@ void AdcTestTask(void)
 			out_msg.test_result = result;
 
 #ifdef PRINT_TESTS_DEBUG
-		    printf("ADC test %s\n", result? "success" : "failed");
+		    printf("ADC test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
 #endif
 
 			// send result to queue
@@ -112,7 +112,7 @@ uint8_t ADC_Test_Perform(void)
 		return TEST_FAILED;
 	}
 
-#ifdef PRINT_TESTS_DEBUG
+#ifdef PRINT_TESTS_DEBUG2
 	printf("adc value = %d\n",adc_buf[0]);
 #endif
 

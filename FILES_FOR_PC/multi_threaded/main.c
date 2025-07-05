@@ -565,7 +565,12 @@ static void run_parallel_tests(uint8_t peripherals, uint8_t n_iter, const char *
     int all_success = 1;
     for (int i = 0; i < n_threads; ++i)
     {
-        if (!results[i]) all_success = 0;
+        if (!results[i])
+        {
+            all_success = 0;
+            printf("test [%d] failed\n", i);
+        } 
+
     }
 
     int log_success = log_test(out_msg.test_id, timestamp, duration, all_success);
