@@ -11,7 +11,7 @@
  *  1. TIM2 (advanced timer) is set to count up.
  *  2. TIM6 (basic timer) is set to restart every 10ms.
  *  3. TIM2 count is sampled every time TIM6 restarts, until N_SAMPLES(=10) are retrieved.
- *  4. A single test passes if all samples are spaced 54,000 counts from each other.
+ *  4. A single test passes if all samples are spaced 54,000 counts from each other, within a tolerance.
  */
 
 #include "stm32f7xx_hal.h"
@@ -26,7 +26,7 @@
 
 #define N_SAMPLES 10                          /** Number of samples */
 #define EXPECTED_INTERVAL 54000               /** Expected interval between samples */
-#define TIM_ERR_TOLERANCE 100                 /** Error tolerance for sample readings */
+#define TIM_ERR_TOLERANCE 10                 /** Error tolerance for sample readings */
 
 /*************************
  * GLOBALS               *
