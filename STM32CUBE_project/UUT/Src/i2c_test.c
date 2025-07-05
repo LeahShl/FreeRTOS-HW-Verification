@@ -90,6 +90,11 @@ uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	uint8_t i2c1_rx[MAX_BUF];
 	uint8_t i2c2_rx[MAX_BUF];
 
+	osSemaphoreAcquire(i2c1TxSem, 0);
+	osSemaphoreAcquire(i2c1RxSem, 0);
+	osSemaphoreAcquire(i2c2TxSem, 0);
+	osSemaphoreAcquire(i2c2RxSem, 0);
+
 	// Send msg i2c1 -> i2c2
 	status = HAL_I2C_Slave_Receive_DMA(&hi2c2, i2c2_rx, msg_len);
 	if (status != HAL_OK)
