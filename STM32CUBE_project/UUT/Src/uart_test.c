@@ -6,7 +6,7 @@
  * @brief Implementation of UART test
  * 
  * UART testing protocol:
- *  1. UART4 sends a bit pattern to UA		printf("IN uart\n");RT5.
+ *  1. UART4 sends a bit pattern to UART5.
  *  2. UART5 sends the bit pattern back to UART4.
  *  3. The loopbacked bit pattern is compared to the original via CRC.
  *  4. The test succeeds if the CRC codes match.

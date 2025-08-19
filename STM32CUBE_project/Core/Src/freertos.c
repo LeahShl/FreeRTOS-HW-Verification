@@ -305,11 +305,7 @@ void StartDefaultTask(void *argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  vTaskDelete(defaultTaskHandle);
   /* USER CODE END StartDefaultTask */
 }
 
