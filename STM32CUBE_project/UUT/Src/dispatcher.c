@@ -24,8 +24,10 @@ void TestDispatcherTask(void)
 	{
 		InMsg_t in_msg;
 		TestData_t test_data;
+		osStatus_t status;
 
-		if(osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, osWaitForever) == osOK)
+		status = osMessageQueueGet(inMsgQueueHandle, &in_msg, 0, osWaitForever);
+		if(status == osOK)
 		{
 			// load test_data
 			test_data.addr = in_msg.addr;
@@ -38,24 +40,48 @@ void TestDispatcherTask(void)
 			// send to relevant test queue
 			if(in_msg.peripheral & TEST_UART)
 			{
-				osMessageQueuePut(uartQueueHandle, &test_data, 0, osWaitForever);
+				status = osMessageQueuePut(uartQueueHandle, &test_data, 0, osWaitForever);
+				if (status != osOK)
+				{
+					LOG_ERR("Dispatcher couldn't put message in uart queue (err code %d)", status);
+				}
 			}
 			if(in_msg.peripheral & TEST_I2C)
 			{
-				osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
+				status = osMessageQueuePut(i2cQueueHandle, &test_data, 0, osWaitForever);
+				if (status != osOK)
+				{
+					LOG_ERR("Dispatcher couldn't put message in i2c queue (err code %d)", status);
+				}
 			}
 			if(in_msg.peripheral & TEST_SPI)
 			{
-				osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
+				status = osMessageQueuePut(spiQueueHandle, &test_data, 0, osWaitForever);
+				if (status != osOK)
+				{
+					LOG_ERR("Dispatcher couldn't put message in spi queue (err code %d)", status);
+				}
 			}
 			if(in_msg.peripheral & TEST_ADC)
 			{
-				osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
+				status = osMessageQueuePut(adcQueueHandle, &test_data, 0, osWaitForever);
+				if (status != osOK)
+				{
+					LOG_ERR("Dispatcher couldn't put message in adc queue (err code %d)", status);
+				}
 			}
 			if(in_msg.peripheral & TEST_TIM)
 			{
-				osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
+				status = osMessageQueuePut(timQueueHandle, &test_data, 0, osWaitForever);
+				if (status != osOK)
+				{
+					LOG_ERR("Dispatcher couldn't put message in timer queue (err code %d)", status);
+				}
 			}
+		}
+		else
+		{
+			LOG_ERR("Dispatcher couldn't get message from queue (err code %d)", status);
 		}
 	}
 }
