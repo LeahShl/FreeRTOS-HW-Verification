@@ -73,54 +73,45 @@ void AdcTestTask(void)
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
 
-#ifdef PRINT_TESTS_DEBUG
-		    printf("ADC test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
-#endif
+		    LOG_INFO("ADC test %s", (result == TEST_SUCCESS)? "success" : "failed");
 
 			// send result to queue
-			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
-		}
-		else if (status == osErrorTimeout)
-		{
-			osDelay(1);
+			status = osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			if (status != osOK)
+			{
+				LOG_ERR("ADC tester couldn't put result in msg queue (err code %d)", status);
+			}
 		}
 		else
 		{
-			printf("adc msg read error: %d\n", status);
-			osDelay(1);
+			LOG_ERR("adc msg read error: %d", status);
 		}
 	}
 }
 
 uint8_t ADC_Test_Perform(void)
 {
-	HAL_StatusTypeDef status;
+	HAL_StatusTypeDef hstatus;
+	osStatus_t status;
 
-	status = HAL_ADC_Start_DMA(&hadc1,(uint32_t*)adc_buf,1);
-	if (status != HAL_OK)
+	hstatus = HAL_ADC_Start_DMA(&hadc1,(uint32_t*)adc_buf,1);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("ADC_Start_DMA failed\n");
-#endif
+		LOG_ERR("ADC_Start_DMA failed (err code %d)", hstatus);
 		return TEST_FAILED;
 	}
 
-	if (osSemaphoreAcquire(adcReadySem, 10) != osOK) {
-#ifdef PRINT_TESTS_DEBUG
-		printf("ADC semaphore timeout\n");
-#endif
+	status = osSemaphoreAcquire(adcReadySem, 10);
+	if (status != osOK) {
+		LOG_ERR("ADC semaphore timeout (err code %d)", status);
 		return TEST_FAILED;
 	}
 
-#ifdef PRINT_TESTS_DEBUG2
-	printf("adc value = %d\n",adc_buf[0]);
-#endif
+	LOG_INFO("adc value = %d", adc_buf[0]);
 
-	if(adc_buf[0] >= EXPECTED_3V3 - ERR_TOLERANCE_3V3) return TEST_SUCCESS;
+	if (adc_buf[0] >= EXPECTED_3V3 - ERR_TOLERANCE_3V3) return TEST_SUCCESS;
 
-#ifdef PRINT_TESTS_DEBUG
-	else printf("bad adc value = %d\n",adc_buf[0]);
-#endif
+	else LOG_INFO("bad adc value = %d",adc_buf[0]);
 
 	return TEST_FAILED;
 }
@@ -131,12 +122,16 @@ uint8_t ADC_Test_Perform(void)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	osSemaphoreRelease(adcReadySem);
-	if(HAL_ADC_Stop_DMA(&hadc1) != HAL_OK)
+	osStatus_t status = osSemaphoreRelease(adcReadySem);
+	if (status != osOK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("ADC_Stop_DMA failed\n");
-#endif
+		LOG_ERR("osSemaphoreRelease failed with error code %d", status);
+	}
+
+	HAL_StatusTypeDef hstatus = HAL_ADC_Stop_DMA(&hadc1);
+	if(hstatus != HAL_OK)
+	{
+		LOG_ERR("ADC_Stop_DMA failed with error code %d", hstatus);
 		Error_Handler();
 	}
 }
