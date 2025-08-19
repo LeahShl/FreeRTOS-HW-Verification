@@ -10,11 +10,19 @@
 #ifndef INC_I2C_TEST_H_
 #define INC_I2C_TEST_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*************************
  * FUNCTION DECLARATIONS *
  *************************/
 
 void I2cTestTask(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_I2C_TEST_H_ */
 

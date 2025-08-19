@@ -1,1 +1,2 @@
-../UUT/Src/hw_verif_crc.c:23:5:Match_CRC	32	static
+../UUT/Src/hw_verif_crc.c:24:5:Init_CRC	8	static
+../UUT/Src/hw_verif_crc.c:38:5:Match_CRC	40	static

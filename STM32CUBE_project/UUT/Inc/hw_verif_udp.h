@@ -13,6 +13,10 @@
 #include "hw_verif_sys.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*************************
  * MACROS                *
  *************************/
@@ -33,5 +37,9 @@ void UDP_Listen(void);
  * @brief Reads from OutMsgQueue and sends requests accordingly
  */
 void UDP_Response(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_HW_VERIF_UDP_H_ */

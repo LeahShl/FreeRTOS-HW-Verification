@@ -31,7 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#define HWT_LOGS_ON 1
+#include "log.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

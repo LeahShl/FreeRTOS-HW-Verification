@@ -27,12 +27,14 @@
 /* USER CODE BEGIN Includes */
 #include "hw_verif_sys.h"
 #include "hw_verif_udp.h"
+#include "hw_verif_crc.h"
 #include "dispatcher.h"
 #include "uart_test.h"
 #include "i2c_test.h"
 #include "spi_test.h"
 #include "adc_test.h"
 #include "timer_test.h"
+#include "log.h"
 
 #include "lwip/stats.h"
 
@@ -305,6 +307,10 @@ void StartDefaultTask(void *argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
+  if (Init_CRC() == CRC_MATCH_FAIL)
+  {
+	  Error_Handler();
+  }
   vTaskDelete(defaultTaskHandle);
   /* USER CODE END StartDefaultTask */
 }

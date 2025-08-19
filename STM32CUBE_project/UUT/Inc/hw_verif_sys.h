@@ -13,12 +13,14 @@
 #include "lwip/ip_addr.h"
 #include "cmsis_os2.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*************************
  * MACROS                *
  *************************/
-
-#define PRINT_TESTS_DEBUG 1        // enable debug prints
-//#define PRINT_TESTS_DEBUG2 1       // enable more debug prints, even annoying ones
+#define HWT_LOGS_ON 1
 
 /**
  * @brief Peripheral codes
@@ -92,5 +94,9 @@ typedef struct TestData
 	uint8_t p_len;                 /** Payload length */
 	char payload[MAX_BUF];         /** Payload buffer */
 }TestData_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_HW_VERIF_SYS_H_ */

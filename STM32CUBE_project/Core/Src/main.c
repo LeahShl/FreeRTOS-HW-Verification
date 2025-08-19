@@ -41,7 +41,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 #define UART_DEBUG &huart3
 /* USER CODE END PD */
 
