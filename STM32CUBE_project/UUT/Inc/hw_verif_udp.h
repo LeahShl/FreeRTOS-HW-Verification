@@ -24,6 +24,12 @@ extern "C" {
 #define SERVER_PORT 54321          // Port for UDP communication
 #define RESPONSE_SIZE 5            // Response is always 5 bytes
 
+#define INMSG_OK 0                 // InMsg validated successfully
+#define INMSG_ERR_TID -1           // Test ID validation error
+#define INMSG_ERR_ITER -2          // Number of iterations validation error
+#define INMSG_ERR_PLEN -3          // payload length validation error
+#define INMSG_ERR_PLD -4           // Payload validation error
+
 /*************************
  * FUNCTION DECLARATIONS *
  *************************/

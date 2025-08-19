@@ -31,6 +31,8 @@ extern "C" {
 #define TEST_I2C 8                 // I2C test code
 #define TEST_ADC 16                // ADC test code
 
+#define ANY_TEST (TEST_UART | TEST_I2C | TEST_SPI | TEST_ADC | TEST_TIM)
+
 /**
  * @brief Limits
  */
