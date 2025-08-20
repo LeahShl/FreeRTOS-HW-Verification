@@ -43,7 +43,7 @@ int Match_CRC(uint8_t *buf1, uint8_t buf1_len, uint8_t *buf2, uint8_t buf2_len)
 		return CRC_MATCH_FAIL;
 	}
 
-	while (osMutexAcquire(crcMutex, osDelay(CRC_MTX_TO)) != osOK)
+	while (osMutexAcquire(crcMutex, CRC_MTX_TO) != osOK)
 	{
 		LOG_WARN("Match_CRC hit timeout while trying to acquire mutex");
 	}

@@ -41,7 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_DEBUG &huart3
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,17 +64,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int __io_putchar(int ch) {
-	HAL_UART_Transmit(UART_DEBUG, (uint8_t*) &ch, 1, 0xFFFF);
-	return ch;
-}
 
-int _write(int file, char *ptr, int len) {
-	char *cr = "\r";
-	HAL_UART_Transmit(UART_DEBUG, (uint8_t*) ptr, len, 0xFFFF);
-	HAL_UART_Transmit(UART_DEBUG, (uint8_t*) cr, 1, 0xFFFF);
-	return len + 1;
-}
 /* USER CODE END 0 */
 
 /**

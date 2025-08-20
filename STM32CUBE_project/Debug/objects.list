@@ -139,6 +139,7 @@
 "./UUT/Src/hw_verif_crc.o"
 "./UUT/Src/hw_verif_udp.o"
 "./UUT/Src/i2c_test.o"
+"./UUT/Src/log.o"
 "./UUT/Src/spi_test.o"
 "./UUT/Src/timer_test.o"
 "./UUT/Src/uart_test.o"

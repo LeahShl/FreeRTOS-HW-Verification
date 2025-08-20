@@ -1,0 +1,2 @@
+../UUT/Src/log.c:14:5:__io_putchar	1
+../UUT/Src/log.c:19:5:_write	3

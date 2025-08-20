@@ -1,0 +1,2 @@
+../UUT/Src/log.c:14:5:__io_putchar	16	static
+../UUT/Src/log.c:19:5:_write	32	static

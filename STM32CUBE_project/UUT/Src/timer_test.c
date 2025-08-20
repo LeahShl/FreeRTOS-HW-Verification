@@ -59,12 +59,14 @@ void TimTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+	osStatus_t status;
 
 	testDoneSem = osSemaphoreNew(1, 0, NULL);
 
 	while (1)
 	{
-		if(osMessageQueueGet(timQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		status = osMessageQueueGet(timQueueHandle, &test_data, 0, osWaitForever);
+		if(status == osOK)
 		{
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
@@ -79,14 +81,23 @@ void TimTestTask(void)
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
 
-#ifdef PRINT_TESTS_DEBUG
-		    printf("Timer test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
-#endif
+		    LOG_INFO("Timer test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
 
 			// send result to queue
-			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			status = osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			if (status != osOK)
+			{
+				LOG_ERR("Timer test couldn't put result to queue (err code: %d", status);
+			}
 		}
-		else osDelay(1);
+		else if (status == osErrorTimeout)
+		{
+			LOG_WARN("Timer test hit timeout getting message from queue");
+		}
+		else
+		{
+			LOG_ERR("Timer test couldn't get message from queue (err code: %d)", status);
+		}
 	}
 }
 

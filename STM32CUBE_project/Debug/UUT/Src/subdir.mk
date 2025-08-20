@@ -10,6 +10,7 @@ C_SRCS += \
 ../UUT/Src/hw_verif_crc.c \
 ../UUT/Src/hw_verif_udp.c \
 ../UUT/Src/i2c_test.c \
+../UUT/Src/log.c \
 ../UUT/Src/spi_test.c \
 ../UUT/Src/timer_test.c \
 ../UUT/Src/uart_test.c 
@@ -20,6 +21,7 @@ OBJS += \
 ./UUT/Src/hw_verif_crc.o \
 ./UUT/Src/hw_verif_udp.o \
 ./UUT/Src/i2c_test.o \
+./UUT/Src/log.o \
 ./UUT/Src/spi_test.o \
 ./UUT/Src/timer_test.o \
 ./UUT/Src/uart_test.o 
@@ -30,6 +32,7 @@ C_DEPS += \
 ./UUT/Src/hw_verif_crc.d \
 ./UUT/Src/hw_verif_udp.d \
 ./UUT/Src/i2c_test.d \
+./UUT/Src/log.d \
 ./UUT/Src/spi_test.d \
 ./UUT/Src/timer_test.d \
 ./UUT/Src/uart_test.d 
@@ -42,7 +45,7 @@ UUT/Src/%.o UUT/Src/%.su UUT/Src/%.cyclo: ../UUT/Src/%.c UUT/Src/subdir.mk
 clean: clean-UUT-2f-Src
 
 clean-UUT-2f-Src:
-	-$(RM) ./UUT/Src/adc_test.cyclo ./UUT/Src/adc_test.d ./UUT/Src/adc_test.o ./UUT/Src/adc_test.su ./UUT/Src/dispatcher.cyclo ./UUT/Src/dispatcher.d ./UUT/Src/dispatcher.o ./UUT/Src/dispatcher.su ./UUT/Src/hw_verif_crc.cyclo ./UUT/Src/hw_verif_crc.d ./UUT/Src/hw_verif_crc.o ./UUT/Src/hw_verif_crc.su ./UUT/Src/hw_verif_udp.cyclo ./UUT/Src/hw_verif_udp.d ./UUT/Src/hw_verif_udp.o ./UUT/Src/hw_verif_udp.su ./UUT/Src/i2c_test.cyclo ./UUT/Src/i2c_test.d ./UUT/Src/i2c_test.o ./UUT/Src/i2c_test.su ./UUT/Src/spi_test.cyclo ./UUT/Src/spi_test.d ./UUT/Src/spi_test.o ./UUT/Src/spi_test.su ./UUT/Src/timer_test.cyclo ./UUT/Src/timer_test.d ./UUT/Src/timer_test.o ./UUT/Src/timer_test.su ./UUT/Src/uart_test.cyclo ./UUT/Src/uart_test.d ./UUT/Src/uart_test.o ./UUT/Src/uart_test.su
+	-$(RM) ./UUT/Src/adc_test.cyclo ./UUT/Src/adc_test.d ./UUT/Src/adc_test.o ./UUT/Src/adc_test.su ./UUT/Src/dispatcher.cyclo ./UUT/Src/dispatcher.d ./UUT/Src/dispatcher.o ./UUT/Src/dispatcher.su ./UUT/Src/hw_verif_crc.cyclo ./UUT/Src/hw_verif_crc.d ./UUT/Src/hw_verif_crc.o ./UUT/Src/hw_verif_crc.su ./UUT/Src/hw_verif_udp.cyclo ./UUT/Src/hw_verif_udp.d ./UUT/Src/hw_verif_udp.o ./UUT/Src/hw_verif_udp.su ./UUT/Src/i2c_test.cyclo ./UUT/Src/i2c_test.d ./UUT/Src/i2c_test.o ./UUT/Src/i2c_test.su ./UUT/Src/log.cyclo ./UUT/Src/log.d ./UUT/Src/log.o ./UUT/Src/log.su ./UUT/Src/spi_test.cyclo ./UUT/Src/spi_test.d ./UUT/Src/spi_test.o ./UUT/Src/spi_test.su ./UUT/Src/timer_test.cyclo ./UUT/Src/timer_test.d ./UUT/Src/timer_test.o ./UUT/Src/timer_test.su ./UUT/Src/uart_test.cyclo ./UUT/Src/uart_test.d ./UUT/Src/uart_test.o ./UUT/Src/uart_test.su
 
 .PHONY: clean-UUT-2f-Src
 
