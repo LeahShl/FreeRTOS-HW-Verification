@@ -127,5 +127,5 @@ Same as [STM32F746ZG Hardware Verification System](https://github.com/LeahShl/ST
 1. TIM2 (advanced timer) is set to count up.
 2. TIM6 (basic timer) is set to restart every 10ms.
 3. TIM2 count is sampled every time TIM6 restarts, until N_SAMPLES(=10) are retrieved.
-4. A single test passes if all samples are spaced 54,000 counts from each other, with a tolerance defaulting to 4000.
+4. A single test passes if all samples are spaced 54,000 counts from each other, with a tolerance defaulting to 10.
 5. The peripheral passes the test if all iterations passed.
