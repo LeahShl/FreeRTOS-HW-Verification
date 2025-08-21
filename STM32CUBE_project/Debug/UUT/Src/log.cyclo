@@ -1,2 +1,4 @@
-../UUT/Src/log.c:14:5:__io_putchar	1
-../UUT/Src/log.c:19:5:_write	3
+../UUT/Src/log.c:16:6:init_log_mtx	2
+../UUT/Src/log.c:24:6:safe_printf	2
+../UUT/Src/log.c:41:5:__io_putchar	1
+../UUT/Src/log.c:46:5:_write	1

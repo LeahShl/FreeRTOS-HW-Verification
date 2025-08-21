@@ -49,6 +49,8 @@ void I2cTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+	osStatus_t status;
+	HAL_StatusTypeDef hstatus;
 
 	i2c1TxSem = osSemaphoreNew(1, 0, NULL);
 	i2c1RxSem = osSemaphoreNew(1, 0, NULL);
@@ -57,7 +59,8 @@ void I2cTestTask(void)
 
 	while (1)
 	{
-		if(osMessageQueueGet(i2cQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		status = osMessageQueueGet(i2cQueueHandle, &test_data, 0, osWaitForever);
+		if(status == osOK)
 		{
 			for (uint8_t i=0; i<test_data.n_iter; i++)
 			{
@@ -72,20 +75,26 @@ void I2cTestTask(void)
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
 
-#ifdef PRINT_TESTS_DEBUG
-		    printf("I2C test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
-#endif
+			LOG_INFO("I2C test %s", (result == TEST_SUCCESS)? "success" : "failed");
 
 			// send result to queue
-			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			status = osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			if(status != osOK)
+			{
+				LOG_ERR("I2C test couldn't put messages into result queue (err code: %d)", status);
+			}
 		}
-		else osDelay(1);
+		else
+		{
+			LOG_ERR("Couldn't get message from i2c test queue (err code: %d)", status);
+		}
 	}
 }
 
 uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 {
-	HAL_StatusTypeDef status;
+	osStatus_t status;
+	HAL_StatusTypeDef hstatus;
 
 	uint8_t i2c1_rx[MAX_BUF];
 	uint8_t i2c2_rx[MAX_BUF];
@@ -96,54 +105,42 @@ uint8_t I2C_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	osSemaphoreAcquire(i2c2RxSem, 0);
 
 	// Send msg i2c1 -> i2c2
-	status = HAL_I2C_Slave_Receive_DMA(&hi2c2, i2c2_rx, msg_len);
-	if (status != HAL_OK)
+	hstatus = HAL_I2C_Slave_Receive_DMA(&hi2c2, i2c2_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c1 -> i2c2 RX failed\n");
-#endif
+		LOG_ERR("i2c1 -> i2c2 RX failed");
 		return TEST_FAILED;
 	}
 
-	status = HAL_I2C_Master_Transmit_DMA(&hi2c1, 10<<1, msg, msg_len);
-	if (status != HAL_OK)
+	hstatus = HAL_I2C_Master_Transmit_DMA(&hi2c1, 10<<1, msg, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c1 -> i2c2 TX failed\n");
-#endif
+		LOG_ERR("i2c1 -> i2c2 TX failed");
 		return TEST_FAILED;
 	}
 	if (osSemaphoreAcquire(i2c1TxSem, 10) != osOK || osSemaphoreAcquire(i2c2RxSem, 10) != osOK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c1 -> i2c2 semaphore timeout\n");
-#endif
+		LOG_ERR("i2c1 -> i2c2 semaphore timeout");
 		return TEST_FAILED;
 	}
 
 	// Send msg i2c2 -> i2c1
-	status = HAL_I2C_Master_Receive_DMA(&hi2c1, 10<<1, i2c1_rx, msg_len);
-	if (status != HAL_OK)
+	hstatus = HAL_I2C_Master_Receive_DMA(&hi2c1, 10<<1, i2c1_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c2 -> i2c1 RX failed\n");
-#endif
+		LOG_ERR("i2c2 -> i2c1 RX failed");
 		return TEST_FAILED;
 	}
 
-	status = HAL_I2C_Slave_Transmit_DMA(&hi2c2, i2c2_rx, msg_len);
-	if (status != HAL_OK)
+	hstatus = HAL_I2C_Slave_Transmit_DMA(&hi2c2, i2c2_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c2 -> i2c1 TX failed\n");
-#endif
+		LOG_ERR("i2c2 -> i2c1 TX failed");
 		return TEST_FAILED;
 	}
 	if (osSemaphoreAcquire(i2c2TxSem, 10) != osOK || osSemaphoreAcquire(i2c1RxSem, 10) != osOK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("i2c2 -> i2c1 semaphore timeout\n");
-#endif
+		printf("i2c2 -> i2c1 semaphore timeout");
 		return TEST_FAILED;
 	}
 

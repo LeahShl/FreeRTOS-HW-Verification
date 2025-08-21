@@ -20,6 +20,7 @@
 #include "main.h"
 #include "hw_verif_sys.h"
 #include "cmsis_os.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -51,15 +52,28 @@ void UartTestTask(void)
 	TestData_t test_data;
 	OutMsg_t out_msg;
 	uint8_t result;
+	osStatus_t status;
+	uint8_t i;
+
 
 	uart4RxSem = osSemaphoreNew(1, 0, NULL);
+	if(uart4RxSem == NULL)
+	{
+		LOG_ERR("Could not create uart4 rx semaphore");
+	}
+
 	uart5RxSem = osSemaphoreNew(1, 0, NULL);
+	if(uart5RxSem == NULL)
+	{
+		LOG_ERR("Could not create uart5 rx semaphore");
+	}
 
 	while (1)
 	{
-		if(osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever) == osOK)
+		status = osMessageQueueGet(uartQueueHandle, &test_data, 0, osWaitForever);
+		if(status == osOK)
 		{
-			for (uint8_t i=0; i<test_data.n_iter; i++)
+			for (i=0; i<test_data.n_iter; i++)
 			{
                 result = UART_Test_Perform((uint8_t *)test_data.payload, test_data.p_len);
 				if (result == TEST_FAILED)
@@ -72,12 +86,18 @@ void UartTestTask(void)
 			out_msg.test_id = test_data.test_id;
 			out_msg.test_result = result;
 
-#ifdef PRINT_TESTS_DEBUG
-		    printf("UART test %s\n", (result == TEST_SUCCESS)? "success" : "failed");
-#endif
+			LOG_INFO("UART test %s", (result == TEST_SUCCESS)? "success" : "failed");
 
 			// send result to queue
-			osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			status = osMessageQueuePut(outMsgQueueHandle, &out_msg, 0, osWaitForever);
+			if(status != osOK)
+			{
+				LOG_ERR("UART test couldn't put messages into result queue (err code: %d)", status);
+			}
+		}
+		else
+		{
+			LOG_ERR("Couldn't get message from uart test queue (err code: %d)", status);
 		}
 	}
 
@@ -88,6 +108,8 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 {
 	uint8_t uart4_rx[MAX_BUF];
 	uint8_t uart5_rx[MAX_BUF];
+	osStatus_t status;
+	HAL_StatusTypeDef hstatus;
 
 	osSemaphoreAcquire(uart4RxSem, 0);
 	osSemaphoreAcquire(uart5RxSem, 0);
@@ -96,24 +118,21 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	HAL_UART_Abort(&huart5);
 
 	// Send msg uart4 -> uart5
-	if (HAL_UART_Receive_DMA(&huart5, uart5_rx, msg_len) != HAL_OK)
+	hstatus = HAL_UART_Receive_DMA(&huart5, uart5_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("uart4 -> uart5 RX1 failed\n");
-#endif
+		LOG_ERR("uart4 -> uart5 RX failed (err code: %d)", hstatus);
 		return TEST_FAILED;
 	}
-	if (HAL_UART_Transmit_IT(&huart4, msg, msg_len) != HAL_OK)
+	hstatus = HAL_UART_Transmit_IT(&huart4, msg, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("uart4 -> uart5 TX failed\n");
-#endif
+		LOG_ERR("uart4 -> uart5 TX failed (err code: %d)", hstatus);
 		return TEST_FAILED;
 	}
-	if (osSemaphoreAcquire(uart5RxSem, 10) != osOK) {
-#ifdef PRINT_TESTS_DEBUG
-	    printf("uart5 RX semaphore timeout\n");
-#endif
+	status = osSemaphoreAcquire(uart5RxSem, 10);
+	if (status != osOK) {
+	    LOG_ERR("uart5 RX semaphore acquire error (err code: %d)", status);
 	    return TEST_FAILED;
 	}
 
@@ -121,24 +140,21 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
 	HAL_UART_Abort(&huart5);
 
 	// Send msg uart5 -> uart4
-	if (HAL_UART_Receive_DMA(&huart4, uart4_rx, msg_len) != HAL_OK)
+	hstatus = HAL_UART_Receive_DMA(&huart4, uart4_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("uart5 -> uart4 RX failed\n");
-#endif
+		LOG_ERR("uart5 -> uart4 RX failed (err code: %d)", hstatus);
 		return TEST_FAILED;
 	}
-	if (HAL_UART_Transmit_IT(&huart5, uart5_rx, msg_len) != HAL_OK)
+	hstatus = HAL_UART_Transmit_IT(&huart5, uart5_rx, msg_len);
+	if (hstatus != HAL_OK)
 	{
-#ifdef PRINT_TESTS_DEBUG
-		printf("uart5 -> uart4 TX failed\n");
-#endif
+		LOG_ERR("uart5 -> uart4 TX failed (err code: %d)", hstatus);
 		return TEST_FAILED;
 	}
-	if (osSemaphoreAcquire(uart4RxSem, 10) != osOK) {
-#ifdef PRINT_TESTS_DEBUG
-	    printf("uart4 RX semaphore timeout\n");
-#endif
+    status = osSemaphoreAcquire(uart4RxSem, 10);
+	if (status != osOK) {
+	    LOG_ERR("uart4 RX semaphore timeout (err code: %d)", status);
 	    return TEST_FAILED;
 	}
 
@@ -153,8 +169,24 @@ uint8_t UART_Test_Perform(uint8_t *msg, uint8_t msg_len)
  * CALLBACK IMPLEMENTATION  *
  ****************************/
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart == &huart4) osSemaphoreRelease(uart4RxSem);
-    if (huart == &huart5) osSemaphoreRelease(uart5RxSem);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	osStatus_t status;
+
+    if (huart == &huart4) {
+    	status = osSemaphoreRelease(uart4RxSem);
+		if(status != osOK)
+		{
+			LOG_ERR("UART callback couldn't release uart4 rx semaphore");
+		}
+    }
+    if (huart == &huart5)
+    {
+    	status = osSemaphoreRelease(uart5RxSem);
+		if(status != osOK)
+		{
+			LOG_ERR("UART callback couldn't release uart5 rx semaphore");
+		}
+    }
 }
 

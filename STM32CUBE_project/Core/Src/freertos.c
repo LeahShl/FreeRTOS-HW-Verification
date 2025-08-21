@@ -311,6 +311,9 @@ void StartDefaultTask(void *argument)
   {
 	  Error_Handler();
   }
+
+  init_log_mtx();
+
   vTaskDelete(defaultTaskHandle);
   /* USER CODE END StartDefaultTask */
 }
